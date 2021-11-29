@@ -31,7 +31,8 @@ def save_to_csv(results, column_names, destination):
 def save_to_bq(client, project, dataset, table, results, schema):
     destination = f"{project}.{dataset}.{table}"
     job_config = bigquery.LoadJobConfig(
-        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE
+        write_disposition=bigquery.WriteDisposition.WRITE_TRUNCATE,
+        schema=schema
     )
     try:
         table = client.get_table(destination)
