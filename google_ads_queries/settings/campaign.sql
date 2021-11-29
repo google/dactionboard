@@ -1,4 +1,5 @@
 SELECT
+    customer.id AS customer_id,
     campaign.id AS campaign_id,
     campaign.name AS campaign_name,
     campaign.status AS status,
@@ -13,6 +14,7 @@ SELECT
     campaign.target_cpa.target_cpa_micros AS target_cpa,
     campaign.target_roas.target_roas AS target_roas,
     campaign.maximize_conversions.target_cpa AS max_conv_target_cpa,
+    campaign.selective_optimization.conversion_actions AS selective_optimization_conversion_actions,
     metrics.cost_micros AS cost,
     metrics.conversions AS conversions
 FROM campaign
