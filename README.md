@@ -17,7 +17,8 @@ pip install -r requirements.txt
 
 2. authenticate google ads to create `google-ads.yaml` file
 
-    2.1. Create `google-ads.yaml` file in your home directory:
+    2.1. Create `google-ads.yaml` file in your home directory with the following content
+    (or copy from `configs` folder):
 
     ```
     developer_token:
@@ -26,6 +27,7 @@ pip install -r requirements.txt
     refresh_token:
     login_customer_id:
     client_customer_id:
+    use_proto_plus: True
     ```
     2.2. [Get Google Ads Developer Token](https://developers.google.com/google-ads/api/docs/first-call/dev-token). Add developer token id to `google-ads.yaml` file.
 
