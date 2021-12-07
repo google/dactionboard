@@ -76,7 +76,7 @@ export END_DATE=
 
 ```
 cd dactionboard
-python runner/runner.py google_ads_queries/*.sql \
+python runner/runner.py google_ads_queries/*/*.sql \
     --customer_id=$CUSTOMER_ID \
     --save=bq \
     --bq_project=$BQ_PROJECT \
