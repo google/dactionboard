@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.from google.ads.googleads.client import GoogleAdsClient
 
+from concurrent import futures
 from google.ads.googleads.client import GoogleAdsClient
 from google.ads.googleads.errors import GoogleAdsException
 import re
@@ -50,23 +51,25 @@ print("getting customers")
 customer_ids = api_handler.get_customer_ids(ga_service, customer_id)
 print("got customers")
 
-for query in args.query:
+
+def process_query(query):
     sql_path = Path(query)
     csv_output_path = sql_path.name.replace('.sql', '.csv')
     bq_table_name = sql_path.name.replace('.sql', '')
 
     # read Ads query from file
-    query_text, fields, column_names, pointers, nested_fields, resource_indices = get_query_elements(sql_path)
+    query_text, fields, column_names, pointers, nested_fields, resource_indices = \
+        get_query_elements(
+        sql_path)
     query_text = utils.format_ads_query(query_text)
-    query_text = query_text.format(start_date = args.start_date, end_date = args.end_date)
+    query_text = query_text.format(start_date=args.start_date, end_date=args.end_date)
     print(query_text)
     getter = attrgetter(*fields)
     results = []
     results_types = {}
 
-    for customer_id, name in customer_ids.items():
-        response = ga_service.search_stream(customer_id=customer_id,
-                                            query=query_text)
+    for customer_id_item, name in customer_ids.items():
+        response = ga_service.search_stream(customer_id=customer_id_item, query=query_text)
         for batch in response:
             for row in batch.results:
                 row_ = getter(row)
@@ -74,22 +77,16 @@ for query in args.query:
                 for i, r in enumerate(row_):
                     try:
                         element = r.name
-                        results_types[column_names[i]] = {
-                            "element_type": type(element)
-                        }
+                        results_types[column_names[i]] = {"element_type": type(element)}
                     except:
                         try:
                             element = r.text
                             elements.append(element)
-                            results_types[column_names[i]] = {
-                                "element_type": type(element)
-                            }
+                            results_types[column_names[i]] = {"element_type": type(element)}
                         except:
                             if pointers.get(fields[i]):
                                 try:
-                                    element = [
-                                        utils.extract_resource(v) for v in r
-                                    ]
+                                    element = [utils.extract_resource(v) for v in r]
                                 except:
                                     element = r
                             elif nested_fields.get(fields[i]):
@@ -102,9 +99,7 @@ for query in args.query:
                                     pass
                             else:
                                 element = r
-                            results_types[column_names[i]] = {
-                                "element_type": type(r)
-                            }
+                            results_types[column_names[i]] = {"element_type": type(r)}
                     if resource_indices.get(fields[i]):
                         element = utils.extract_id_from_resource(element, 1)
                     elements.append(element)
@@ -114,14 +109,16 @@ for query in args.query:
         print(",".join(column_names))
         print(results)
     if args.save == "csv":
-        writer.save_to_csv(results, column_names, args.destination
-                           or csv_output_path)
+        writer.save_to_csv(results, column_names, args.destination or csv_output_path)
     elif args.save == "bq":
         if not args.bq_project and args.bq_dataset:
             raise ValueError(
-                "--bq_project and --bq_dataset parameters must be specified when saving to BigQuery!"
-            )
+                "--bq_project and --bq_dataset parameters must be specified when saving to "
+                "BigQuery!")
         schema = utils.get_bq_schema(results_types)
-        df = pd.DataFrame(results, columns = column_names)
-        writer.save_to_bq(bq_client, args.bq_project, args.bq_dataset,
-                          bq_table_name, df, schema)
+        df = pd.DataFrame(results, columns=column_names)
+        writer.save_to_bq(bq_client, args.bq_project, args.bq_dataset, bq_table_name, df, schema)
+
+
+with futures.ThreadPoolExecutor() as executor:
+    results = executor.map(process_query, args.query)
