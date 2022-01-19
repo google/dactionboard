@@ -12,26 +12,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import utils
+from typing import Any, Dict, List, Optional, Sequence, Union
+import abc
+import dataclasses
 import re
 
+import utils
+from formatter import QueryTextFormatter
 
-def read_query(path):
+
+@dataclasses.dataclass
+class QueryElements:
+    """Contains raw query and parsed elements.
+
+    Attributes:
+        query_text: Text of the query that needs to be parsed.
+        fields: Ads API fields that need to be feched.
+        column_names: friendly names for fields which are used when saving data
+        pointers: Attributes of fields that need to be be extracted.
+        nested_fields: Multiple elements that need to be fetched from a single
+            resource.
+        resource_indices: Position of element in resource_name.
+    """
+    query_text: str
+    fields: List[str]
+    column_names: List[str]
+    pointers: Optional[Dict[str, str]]
+    nested_fields: Optional[Union[Any, List[Any]]]
+    resource_indices: Optional[Dict[str, str]]
+
+
+def get_query_elements(path: str) -> QueryElements:
+    """Reads query from a file and returns different elements of a query.
+
+    Args:
+        path: Path to a file with a query.
+
+    Returns:
+        Various elements parsed from a query (text, fields, column_names, etc).
+    """
     with open(path, "r") as f:
-        query = f.readlines()
-    return query
-
-
-# read Ads query from file
-def get_query_elements(path):
-    query_lines = read_query(path)
-    query_text = "".join(query_lines)
+        query_lines = f.readlines()
+    query_text = QueryTextFormatter.format_ads_query("".join(query_lines))
     fields = []
     column_names = []
     pointers = {}
     nested_fields = {}
     resource_indices = {}
-    # iterate over each line of file to extract field_names and column_names
+
     for line in query_lines:
         # exclude SELECT keyword
         if line.upper().startswith("SELECT"):
@@ -69,8 +97,14 @@ def get_query_elements(path):
         except:
             column_name = field_name
         try:
-            resource_indices[field_name] = utils.get_element(resource_elements, 1)
+            resource_indices[field_name] = utils.get_element(
+                resource_elements, 1)
         except:
             pass
         column_names.append(column_name)
-    return (query_text, fields, column_names, pointers, nested_fields, resource_indices)
+    return QueryElements(query_text=query_text,
+                         fields=fields,
+                         column_names=column_names,
+                         pointers=pointers,
+                         nested_fields=nested_fields,
+                         resource_indices=resource_indices)

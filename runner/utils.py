@@ -12,19 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import proto
 
+from typing import Sequence
 import re
-import proto
-from google.cloud import bigquery
+import proto  # type: ignore
+from google.cloud import bigquery  # type: ignore
 
 
-def format_ads_query(query):
-    # remove aliases
-    query = re.sub("\s+[Aa][Ss]\s+(\w+)", "", query)
-    # remove pointers
-    query = re.sub("~(\w+)|->", "", query)
-    query = re.sub("->(\w+)|->", "", query)
-    query = re.sub(":((\w+)\.*){1,}", "", query)
-    return query
+class ResourceFormatter:
+    @staticmethod
+    def get_resource(element):
+        return re.split(": ", str(element).strip())[1]
+
+    @staticmethod
+    def get_resource_id(element):
+        return re.split("/", str(element))[-1]
+
+    @staticmethod
+    def clean_resource_id(element):
+        element = re.sub('"', '', str(element))
+        try:
+            return int(element)
+        except:
+            return element
 
 
 def get_element(elements, position):
@@ -34,9 +43,9 @@ def get_element(elements, position):
 def extract_resource(field):
     return re.sub('"', '', re.split(": ", str(field).strip())[1])
 
+
 def extract_id_from_resource(resource, id, delimeter="~"):
     return re.split(delimeter, resource)[id]
-
 
 
 TYPE_MAPPING = {
@@ -57,7 +66,6 @@ def get_bq_schema(types):
         schema.append(
             bigquery.SchemaField(
                 name=key,
-                field_type="STRING"
-                if element_type == "REPEATED" else element_type,
-                mode="REPEATED" if element_type == "REPEATED" else "NULLABLE"))
+                field_type="STRING" if not element_type else element_type,
+                mode="REPEATED" if value.get("repeated") else "NULLABLE"))
     return schema
