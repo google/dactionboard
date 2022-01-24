@@ -72,7 +72,7 @@ export START_DATE=
 export END_DATE=
 ```
 
-5. Run script to fetch data and store in BigQuery
+5. Run `runner.py` script to fetch Google Ads data and store them in BigQuery
 
 ```
 cd dactionboard
@@ -83,4 +83,12 @@ python runner/runner.py google_ads_queries/*/*.sql \
     --bq_dataset=$BQ_DATASET \
     --start_date=$START_DATE \
     --end_date=$END_DATE
+```
+
+6. Run `post_processor.py` script to prepare tables in BigQuery to be used in a dashboard
+
+```
+python runner/post_processor.py bq_queries/*.sql \
+    --bq_project=$BQ_PROJECT \
+    --bq_dataset=$BQ_DATASET \
 ```
