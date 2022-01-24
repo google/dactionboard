@@ -1,3 +1,5 @@
+CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.creative_excellence_F
+AS (
 WITH
     /* Creatives block */
     AdsTable AS (
@@ -10,15 +12,16 @@ WITH
     SitelinksAdGroupTable AS (
 	SELECT
 	    campaign_id,
-	    SUM(ARRAY_LENGTH(sitelinks)) AS n_ad_group_sitelinks
+	    SUM(ARRAY_LENGTH(SPLIT(sitelinks, "|"))) AS n_ad_group_sitelinks
 	FROM `{bq_project}.{bq_dataset}.sitelinks_ad_group`
 	GROUP BY 1
     ),
     SitelinksCampaignTable AS (
 	SELECT
 	    campaign_id,
-	    ARRAY_LENGTH(sitelinks) AS n_campaign_sitelinks
+	    SUM(ARRAY_LENGTH(SPLIT(sitelinks, "|"))) AS n_campaign_sitelinks
 	FROM `{bq_project}.{bq_dataset}.sitelinks_campaign`
+	GROUP BY 1
     ),
     SitelinksTable AS (
 	SELECT
@@ -204,13 +207,23 @@ WITH
         USING(campaign_id, customer_id)
      LEFT JOIN TargetingCriteriaTable AS T
         USING(customer_id)
+    ),
+    MappingTable AS (
+	SELECT DISTINCT
+	    account_id,
+	    account_name,
+	    campaign_id,
+	    campaign_name,
+	    campaign_status
+	FROM {bq_project}.{bq_dataset}.mapping
     )
+
     SELECT
-	account_id,
-	account_name,
-        campaign_id,
-	campaign_name,
-	campaign_status,
+	M.account_id,
+	M.account_name,
+        M.campaign_id,
+	M.campaign_name,
+	M.campaign_status,
 	start_date,
 	end_date,
         bidding_strategy,
@@ -239,8 +252,7 @@ WITH
             )) AS summary,
 	has_auto_targeting,
 	has_sitelinks,
-	cost AS cost_last_7_days
+	ROUND(cost / 1e6, 2) AS cost_last_7_days
     FROM CreativeExcellenceTable
-    LEFT JOIN
-	{bq_project}.{bq_dataset}.mapping
-	USING(campaign_id)
+    LEFT JOIN MappingTable AS M
+        USING(campaign_id));
