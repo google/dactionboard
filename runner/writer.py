@@ -93,7 +93,7 @@ class BigQueryWriter(AbsWriter):
 
     def write(self, results, destination, header) -> str:
         formatted_results = BigQueryFormatter.format(results, "|")
-        schema = self._define_header(results, header)
+        schema = self._define_header(formatted_results, header)
         bq_dataset = self._create_or_get_dataset()
         destination = DestinationFormatter.format_extension(destination)
         table = self._create_or_get_table(f"{self.dataset_id}.{destination}",
