@@ -9,7 +9,7 @@ WITH
 	FROM {bq_project}.{bq_dataset}.geo_target_constant
     )
 SELECT
-    AP.date AS day,
+    PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
     M.currency,

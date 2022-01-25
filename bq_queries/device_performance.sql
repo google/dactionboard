@@ -1,7 +1,7 @@
 CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.device_performance_F
 AS (
 SELECT
-    AP.date AS day,
+    PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
     M.currency,

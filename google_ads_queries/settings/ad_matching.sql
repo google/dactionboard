@@ -8,3 +8,17 @@ SELECT
     video.title AS youtube_title,
     video.duration_millis AS youtube_video_duration
 FROM video
+WHERE ad_group_ad.ad.type IN (
+	"VIDEO",
+	"VIDEO_RESPONSIVE",
+	"VIDEO_BUMPER",
+	"VIDEO_NON_SKIPPABLE_IN_STREAM",
+	"VIDEO_OUTSTREAM",
+	"VIDEO_RESPONSIVE",
+	"VIDEO_TRUE_VIEW_IN_DISPLAY",
+	"VIDEO_TRUE_VIEW_IN_STREAM"
+	)
+    AND campaign.bidding_strategy_type IN (
+	"MAXIMIZE_CONVERSIONS",
+	"TARGET_CPA"
+    )

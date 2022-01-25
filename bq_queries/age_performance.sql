@@ -1,7 +1,7 @@
 CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.age_performance_F
 AS (
 SELECT
-    AP.date AS day,
+    PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
     M.currency,
@@ -11,7 +11,7 @@ SELECT
     M.ad_group_id,
     M.ad_group_name,
     M.ad_group_status,
-    AP.age_range,
+    REPLACE(AP.age_range, "AGE_RANGE_", "") AS age_range,
     SUM(AP.clicks) AS clicks,
     SUM(AP.impressions) AS impressions,
     SUM(AP.all_conversions) AS all_conversions,

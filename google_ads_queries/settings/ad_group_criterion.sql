@@ -19,3 +19,7 @@ WHERE
     )
     AND ad_group_criterion.status = "ENABLED"
     AND ad_group_criterion.negative = FALSE
+    AND campaign.bidding_strategy_type IN (
+	"MAXIMIZE_CONVERSIONS",
+	"TARGET_CPA"
+    )
