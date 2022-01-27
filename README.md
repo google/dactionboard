@@ -72,6 +72,9 @@ export START_DATE=
 export END_DATE=
 ```
 
+`START_DATE` and `END_DATE` should be specified in `YYYY-MM-DD` format (i.e. 2022-01-01).
+`CUSTOMER_ID` should be specifed in `1234567890` format (no dashes between digits).
+
 5. Run `runner.py` script to fetch Google Ads data and store them in BigQuery
 
 ```
