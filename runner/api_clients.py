@@ -13,6 +13,7 @@
 # limitations under the License.
 from google.ads.googleads.client import GoogleAdsClient  #type: ignore
 from google.ads.googleads.v9.services.services.google_ads_service.client import GoogleAdsServiceClient  #type: ignore
+from pathlib import Path
 
 
 class BaseClient:
@@ -21,8 +22,10 @@ class BaseClient:
 
 
 class GoogleAdsApiClient(BaseClient):
-    def __init__(self):
-        self.client = GoogleAdsClient.load_from_storage(version="v9")
+    default_google_ads_yaml = str(Path.home() / "google-ads.yaml")
+    def __init__(self, path_to_config:str = default_google_ads_yaml, version: str = "v9"):
+        self.client = GoogleAdsClient.load_from_storage(
+            path=path_to_config, version=version)
         self.ga_service = self.client.get_service("GoogleAdsService")
 
     def get_client(self):

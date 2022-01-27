@@ -36,7 +36,8 @@ logging.getLogger("google.ads.googleads.client").setLevel(logging.WARNING)
 
 args = arg_parser.parse_cli_args()
 
-ga_service = api_clients.GoogleAdsApiClient().get_client()
+ga_service = api_clients.GoogleAdsApiClient(
+    path_to_config=args.config).get_client()
 
 google_ads_row_parser = parsers.GoogleAdsRowParser()
 

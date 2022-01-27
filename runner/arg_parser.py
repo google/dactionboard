@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import argparse
+from pathlib import Path
 
 
 def parse_cli_args():
@@ -20,10 +21,11 @@ def parse_cli_args():
     parser.add_argument("query", nargs="+")
     parser.add_argument("--customer_id", dest="customer_id")
     parser.add_argument("--save", dest="save", default="csv")
-    parser.add_argument("-p", dest="print", default=False)
     parser.add_argument("--destination", dest="destination")
     parser.add_argument("--bq_project", dest="project")
     parser.add_argument("--bq_dataset", dest="dataset")
     parser.add_argument("--start_date", dest="start_date")
     parser.add_argument("--end_date", dest="end_date")
+    parser.add_argument("-c|-path-to-api-config|", dest="config",
+                        default=str(Path.home() / "google-ads.yaml"))
     return parser.parse_args()
