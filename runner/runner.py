@@ -17,10 +17,8 @@ from typing import Any, Callable, Dict, Sequence
 import sys
 import logging
 
-from google.ads.googleads.client import GoogleAdsClient  #type: ignore
 from google.ads.googleads.v9.services.services.google_ads_service.client import GoogleAdsServiceClient  #type: ignore
 from operator import attrgetter
-from itertools import repeat
 
 import arg_parser
 import parsers
@@ -78,6 +76,15 @@ def process_query(query: str, customer_ids: Dict[str, str],
 
 
 with futures.ThreadPoolExecutor() as executor:
-    results = executor.map(process_query, args.query, repeat(customer_ids),
-                           repeat(ga_service), repeat(google_ads_row_parser),
-                           repeat(writer_client))
+    future_to_query = {
+        executor.submit(process_query, query, customer_ids, ga_service,
+                        google_ads_row_parser, writer_client): query
+        for query in args.query
+    }
+    for future in futures.as_completed(future_to_query):
+        query = future_to_query[future]
+        try:
+            result = future.result()
+            print(f"{query} executed successfully")
+        except Exception as e:
+            print(f"{query} generated an exception: {e}")

@@ -41,6 +41,15 @@ def run_post_processing_query(path: str, bq_client: bigquery.Client,
 
 
 with futures.ThreadPoolExecutor() as executor:
-    results = executor.map(run_post_processing_query, args.query,
-                           repeat(bq_client), repeat(args.project),
-                           repeat(args.dataset))
+    future_to_query = {
+        executor.submit(run_post_processing_query, query, bq_client,
+                        args.project, args.dataset): query
+        for query in args.query
+    }
+    for future in futures.as_completed(future_to_query):
+        query = future_to_query[future]
+        try:
+            result = future.result()
+            print(f"{query} executed successfully")
+        except Exception as e:
+            print(f"{query} generated an exception: {e}")
