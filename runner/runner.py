@@ -72,8 +72,13 @@ def process_query(query: str, customer_ids: Dict[str, str],
 
     logging.info("[Query: %s] total size in bytes - %d", query,
                  sys.getsizeof(total_results))
-    output = writer_client.write(total_results, query,
-                                 query_elements.column_names)
+    if len(total_results) > 0:
+        output = writer_client.write(total_results, query,
+                                     query_elements.column_names)
+    else:
+        raise ValueError(
+            f"{query} generated 0 rows of data, please check WHERE statements."
+        )
 
 
 with futures.ThreadPoolExecutor() as executor:
