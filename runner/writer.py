@@ -48,24 +48,25 @@ class AbsWriter(abc.ABC):
 
 class CsvWriter(AbsWriter):
     def __init__(self,
-                 folder=os.getcwd(),
+                 destination_folder=os.getcwd(),
                  delimiter=",",
                  quotechar='"',
                  quoting=csv.QUOTE_MINIMAL,
                  **kwargs):
-        self.folder = folder
+        self.destination_folder = destination_folder
         self.delimiter = delimiter
         self.quotechar = quotechar
         self.quoting = quoting
 
     def __str__(self):
-        return f"[CSV] - data are saved to {self.folder} folder."
+        return f"[CSV] - data are saved to {self.destination_folder} destination_folder."
 
     def write(self, results, destination, header) -> str:
         header = self._define_header(results, header)
         destination = DestinationFormatter.format_extension(
             destination, new_extension=".csv")
-        with open(os.path.join(self.folder, destination), "w") as file:
+        with open(os.path.join(self.destination_folder, destination),
+                  "w") as file:
             writer = csv.writer(file,
                                 delimiter=self.delimiter,
                                 quotechar=self.quotechar,
