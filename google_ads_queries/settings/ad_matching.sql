@@ -1,9 +1,11 @@
 SELECT
     campaign.id AS campaign_id,
     campaign.name AS campaign_name,
+    campaign.status AS campaign_status,
     campaign.bidding_strategy_type AS bidding_strategy,
     ad_group.name AS ad_group_name,
     ad_group_ad.ad.id AS ad_id,
+    ad_group_ad.status AS ad_status,
     ad_group_ad.ad.type AS ad_group_ad_type,
     ad_group_ad.ad.name AS ad_name,
     video.id AS youtube_video_id,

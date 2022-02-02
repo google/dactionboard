@@ -12,6 +12,7 @@ SELECT
     M.ad_group_name,
     M.ad_group_status,
     AP.ad_id AS ad_id,
+    AM.ad_name AS ad_name,
     AM.youtube_video_id,
     AM.youtube_title AS video_title,
     AM.youtube_video_duration AS video_duration,
@@ -33,6 +34,6 @@ INNER JOIN {bq_project}.{bq_dataset}.video_headlines_call_to_actions AS V
   ON AP.ad_id = V.ad_id
 INNER JOIN {bq_project}.{bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
-INNER JOIN {bq_project}.{bq_dataset}.asset_mapping AS A
-  ON V.companion_banner = CAST(A.asset_id AS STRING)
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17);
+INNER JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets
+  ON V.companion_banner = CAST(Assets.asset_id AS STRING)
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18);
