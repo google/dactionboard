@@ -15,8 +15,8 @@ FROM gender_view
 WHERE
     segments.date >= "{start_date}"
     AND segments.date <= "{end_date}"
-    AND ad_group.type IN (
-	"VIDEO_RESPONSIVE",
+	AND ad_group.type IN (
+  "VIDEO_RESPONSIVE",
 	"VIDEO_TRUE_VIEW_IN_DISPLAY",
 	"VIDEO_TRUE_VIEW_IN_STREAM"
 	)

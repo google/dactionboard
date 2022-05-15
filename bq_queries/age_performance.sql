@@ -11,7 +11,7 @@ SELECT
     M.ad_group_id,
     M.ad_group_name,
     M.ad_group_status,
-    REPLACE(AP.age_range, "AGE_RANGE_", "") AS age_range,
+    REPLACE(REPLACE(AP.age_range, "AGE_RANGE_", ""), "_", "-") AS age_range,
     SUM(AP.clicks) AS clicks,
     SUM(AP.impressions) AS impressions,
     SUM(AP.all_conversions) AS all_conversions,

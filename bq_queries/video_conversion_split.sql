@@ -14,7 +14,7 @@ SELECT
     AP.ad_id,
     AM.youtube_video_id,
     AM.youtube_title AS video_title,
-    AM.youtube_video_duration AS video_duration,
+    ROUND(AM.youtube_video_duration/1000, 2) AS video_duration,
     AP.conversion_name,
     SUM(AP.all_conversions) AS all_conversions,
     SUM(AP.conversions) AS conversions,
