@@ -217,42 +217,45 @@ WITH
 	    campaign_status
 	FROM {bq_project}.{bq_dataset}.mapping
     )
-
-    SELECT
-	M.account_id,
-	M.account_name,
-        M.campaign_id,
-	M.campaign_name,
-	M.campaign_status,
-	start_date,
-	end_date,
-        bidding_strategy,
-        creatives_bucket,
-	audience_bucket,
-        budget_bid_ratio_bucket,
-	conversions_bucket,
-        (
-            CAST(is_audience_optimized AS INT) +
-            CAST(is_bid_budget_optimized AS INT) +
-            CAST(is_conversions_optimized AS INT) +
-            CAST(is_creative_optimized AS INT)
-         ) / 4 AS perc_bp_score,
-        IF(
-            is_audience_optimized
-            AND is_bid_budget_optimized
-            AND is_conversions_optimized
-            AND is_creative_optimized,
-            "Check Advanced Best Practices.",
-            CONCAT(
-                "Optimize: ",
-                IF(is_audience_optimized, "", "| Audience "),
-                IF(is_bid_budget_optimized, "", "| Budget/Bid "),
-                IF(is_conversions_optimized, "", "| Conversions "),
-                IF(is_creative_optimized, "", "| Creatives")
-            )) AS summary,
-	has_auto_targeting,
-	has_sitelinks,
-	ROUND(cost / 1e6, 2) AS cost_last_7_days
-    FROM CreativeExcellenceTable
-    LEFT JOIN MappingTable AS M
-        USING(campaign_id));
+SELECT
+    M.account_id,
+    M.account_name,
+    M.campaign_id,
+    M.campaign_name,
+    M.campaign_status,
+    start_date,
+    end_date,
+    bidding_strategy,
+    creatives_bucket,
+    audience_bucket,
+    budget_bid_ratio_bucket,
+    conversions_bucket,
+    is_audience_optimized,
+    is_bid_budget_optimized,
+    is_conversions_optimized,
+    is_creative_optimized,
+    (
+        CAST(is_audience_optimized AS INT) +
+        CAST(is_bid_budget_optimized AS INT) +
+        CAST(is_conversions_optimized AS INT) +
+        CAST(is_creative_optimized AS INT)
+        ) / 4 AS perc_bp_score,
+    IF(
+        is_audience_optimized
+        AND is_bid_budget_optimized
+        AND is_conversions_optimized
+        AND is_creative_optimized,
+        "Check Advanced Best Practices.",
+        CONCAT(
+        "Optimize: ",
+        IF(is_audience_optimized, "", "| Audience "),
+        IF(is_bid_budget_optimized, "", "| Budget/Bid "),
+        IF(is_conversions_optimized, "", "| Conversions "),
+        IF(is_creative_optimized, "", "| Creatives")
+        )) AS summary,
+    has_auto_targeting,
+    has_sitelinks,
+    ROUND(cost / 1e6, 2) AS cost_last_7_days
+FROM CreativeExcellenceTable
+LEFT JOIN MappingTable AS M
+    USING(campaign_id));

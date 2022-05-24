@@ -32,11 +32,7 @@ WITH
           ON CAST( SPLIT(C.location, "/")[OFFSET(1)] AS INT64) = GT.constant_id
         GROUP BY 1, 2
     )
-
-SELECT * 
-FROM 
-
-(SELECT
+SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
@@ -52,14 +48,13 @@ FROM
     AM.youtube_title AS video_title,
     ROUND(AM.youtube_video_duration/1000) AS video_duration,
     COALESCE(V.headlines, V.long_headlines) AS headlines,
-    CASE WHEN V.call_to_actions != "" and V.call_to_actions IS NOT NULL 
+    CASE WHEN V.call_to_actions != "" and V.call_to_actions IS NOT NULL
             THEN call_to_actions
         WHEN V.action_button_label != "" AND V.action_button_label IS NOT NULL
             THEN action_button_label
-        ELSE 
-          ''
+        ELSE ""
     END AS call_to_action,
-    Assets.url AS companion_banner_url,
+    COALESCE(Assets.url, Assets2.url) AS companion_banner_url,
     ARRAY_TO_STRING(TT.campaign_audiences, " | ") AS campaign_audiences,
     ARRAY_TO_STRING(TT.ad_group_audiences, " | ") AS ad_group_audiences,
     ARRAY_TO_STRING(TT.devices, " | ") AS devices,
@@ -76,16 +71,15 @@ FROM
 FROM {bq_project}.{bq_dataset}.ad_performance AS AP
 INNER JOIN {bq_project}.{bq_dataset}.ad_matching AS AM
   ON AP.ad_id = AM.ad_id
-INNER JOIN {bq_project}.{bq_dataset}.video_headlines_call_to_actions AS V
+LEFT JOIN {bq_project}.{bq_dataset}.video_headlines_call_to_actions AS V
   ON AP.ad_id = V.ad_id
-INNER JOIN {bq_project}.{bq_dataset}.mapping AS M
+LEFT JOIN {bq_project}.{bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
-INNER JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets
-  ON SPLIT(V.companion_banner, "/")[OFFSET(3)] = CAST(Assets.asset_id AS STRING)
+LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets
+  ON V.companion_banner = CAST(Assets.asset_id AS STRING)
+LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets2
+  ON V.companion_banners = CAST(Assets.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
-    ON M.campaign_id = TT.campaign_id 
+    ON M.campaign_id = TT.campaign_id
         AND M.ad_group_id = M.ad_group_id
-WHERE V.companion_banner LIKE "%/%"
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22)
-
-WHERE call_to_action != '');
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
