@@ -1,7 +1,6 @@
 SELECT
     segments.date AS date,
     user_location_view.country_criterion_id AS country_criterion_id,
-    segments.geo_target_city AS city,
     campaign.bidding_strategy_type AS bidding_strategy_type,
     ad_group.id AS ad_group_id,
     ad_group.type AS ad_group_type,
