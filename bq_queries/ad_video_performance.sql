@@ -76,9 +76,9 @@ LEFT JOIN {bq_project}.{bq_dataset}.video_headlines_call_to_actions AS V
 LEFT JOIN {bq_project}.{bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets
-  ON V.companion_banner = CAST(Assets.asset_id AS STRING)
+  ON V.in_stream_companion_banner = CAST(Assets.asset_id AS STRING)
 LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets2
-  ON V.companion_banners = CAST(Assets.asset_id AS STRING)
+  ON V.responsive_companion_banner = CAST(Assets.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
     ON M.campaign_id = TT.campaign_id
         AND M.ad_group_id = M.ad_group_id
