@@ -18,7 +18,12 @@ SELECT
     metrics.cost_micros AS cost,
     metrics.conversions AS conversions
 FROM campaign
-WHERE campaign.advertising_channel_type = "VIDEO"
-    AND segments.date >= "{start_date}"
-    AND segments.date <= "{end_date}"
-    AND metrics.impressions >= 0
+WHERE
+    campaign.advertising_channel_sub_type IN (
+        "VIDEO_ACTION",
+        "APP_CAMPAIGN"
+    )
+    AND campaign.bidding_strategy_type IN (
+        "MAXIMIZE_CONVERSIONS",
+        "TARGET_CPA"
+    )

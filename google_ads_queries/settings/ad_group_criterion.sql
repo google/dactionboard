@@ -14,12 +14,13 @@ SELECT
 FROM ad_group_criterion
 WHERE
     ad_group_criterion.type IN (
-	"CUSTOM_AUDIENCE",
-	"USER_LIST"
+        "CUSTOM_AUDIENCE",
+        "USER_LIST"
     )
     AND ad_group_criterion.status = "ENABLED"
     AND ad_group_criterion.negative = FALSE
+    AND campaign.advertising_channel_sub_type = "VIDEO_ACTION"
     AND campaign.bidding_strategy_type IN (
-	"MAXIMIZE_CONVERSIONS",
-	"TARGET_CPA"
+        "MAXIMIZE_CONVERSIONS",
+        "TARGET_CPA"
     )

@@ -1,6 +1,7 @@
 SELECT
     segments.date AS date,
     user_location_view.country_criterion_id AS country_criterion_id,
+    campaign.advertising_channel_sub_type AS campaign_sub_type,
     campaign.bidding_strategy_type AS bidding_strategy_type,
     ad_group.id AS ad_group_id,
     ad_group.type AS ad_group_type,
@@ -16,12 +17,8 @@ FROM user_location_view
 WHERE
     segments.date >= "{start_date}"
     AND segments.date <= "{end_date}"
-    AND ad_group.type IN (
-	"VIDEO_RESPONSIVE",
-	"VIDEO_TRUE_VIEW_IN_DISPLAY",
-	"VIDEO_TRUE_VIEW_IN_STREAM"
-	)
+    AND campaign.advertising_channel_sub_type = "VIDEO_ACTION"
     AND campaign.bidding_strategy_type IN (
-	"MAXIMIZE_CONVERSIONS",
-	"TARGET_CPA"
+        "MAXIMIZE_CONVERSIONS",
+        "TARGET_CPA"
     )

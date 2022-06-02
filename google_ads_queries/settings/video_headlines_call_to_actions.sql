@@ -11,12 +11,8 @@ SELECT
     ad_group_ad.ad.video_ad.in_stream.action_button_label AS action_button_label,
     ad_group_ad.ad.video_ad.in_stream.companion_banner.asset AS in_stream_companion_banner
 FROM ad_group_ad
-WHERE ad_group_ad.ad.type IN (
-	"VIDEO_RESPONSIVE_AD",
-	"VIDEO_TRUEVIEW_DISCOVERY_AD",
-	"VIDEO_TRUEVIEW_IN_STREAM_AD"
-	)
+WHERE campaign.advertising_channel_sub_type = "VIDEO_ACTION"
     AND campaign.bidding_strategy_type IN (
-	"MAXIMIZE_CONVERSIONS",
-	"TARGET_CPA"
+        "MAXIMIZE_CONVERSIONS",
+        "TARGET_CPA"
     )
