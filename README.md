@@ -36,26 +36,26 @@ export END_DATE=
 `START_DATE` and `END_DATE` should be specified in `YYYY-MM-DD` format (i.e. 2022-01-01).
 `CUSTOMER_ID` should be specifed in `1234567890` format (no dashes between digits).
 
-2. Run `fetch-reports` command to fetch Google Ads data and store them in BigQuery
+2. Run `gaarf` command to fetch Google Ads data and store them in BigQuery
 
 ```
-fetch-reports google_ads_queries/*/*.sql \
+gaarf google_ads_queries/*/*.sql \
     --account=$CUSTOMER_ID \
     --output=bq \
     --bq.project=$BQ_PROJECT \
     --bq.dataset=$BQ_DATASET \
-    --sql.start_date=$START_DATE \
-    --sql.end_date=$END_DATE \
+    --macro.start_date=$START_DATE \
+    --macro.end_date=$END_DATE \
     --ads-config=path/to/google-ads.yaml
 ```
 
-3. Run `post-process-queries` command to prepare tables in BigQuery based on data
-fetched by `fetch-reports` command.
+3. Run `gaarf-bq` command to prepare tables in BigQuery based on data
+fetched by `gaarf` command.
 
 ```
-post-process-queries bq_queries/*.sql \
-    --bq.project=$BQ_PROJECT \
-    --bq.dataset=$BQ_DATASET
+gaarf-bq bq_queries/*.sql \
+    --macro.bq_project=$BQ_PROJECT \
+    --macro.bq_dataset=$BQ_DATASET
 ```
 
 ## Disclaimer
