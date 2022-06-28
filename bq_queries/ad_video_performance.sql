@@ -78,7 +78,7 @@ LEFT JOIN {bq_project}.{bq_dataset}.mapping AS M
 LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets
   ON V.in_stream_companion_banner = CAST(Assets.asset_id AS STRING)
 LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets2
-  ON V.responsive_companion_banner = CAST(Assets.asset_id AS STRING)
+  ON V.responsive_companion_banner = CAST(Assets2.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
     ON M.campaign_id = TT.campaign_id
         AND M.ad_group_id = M.ad_group_id
