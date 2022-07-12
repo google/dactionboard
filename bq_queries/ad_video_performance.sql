@@ -81,5 +81,5 @@ LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets2
   ON V.responsive_companion_banner = CAST(Assets2.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
     ON M.campaign_id = TT.campaign_id
-        AND M.ad_group_id = M.ad_group_id
+        AND M.ad_group_id = TT.ad_group_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
