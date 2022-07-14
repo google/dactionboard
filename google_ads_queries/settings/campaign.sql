@@ -21,4 +21,3 @@ FROM campaign
 WHERE campaign.advertising_channel_type = "VIDEO"
     AND segments.date >= "{start_date}"
     AND segments.date <= "{end_date}"
-    AND metrics.impressions >= 0

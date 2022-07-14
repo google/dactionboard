@@ -15,15 +15,15 @@ SELECT
     metrics.video_views AS video_views,
     metrics.engagements AS engagements
 FROM ad_group_ad
-WHERE metrics.impressions >= 0
-    AND segments.date >= "{start_date}"
+WHERE
+    segments.date >= "{start_date}"
     AND segments.date <= "{end_date}"
     AND ad_group.type IN (
-	"VIDEO_RESPONSIVE",
-	"VIDEO_TRUE_VIEW_IN_DISPLAY",
-	"VIDEO_TRUE_VIEW_IN_STREAM"
-	)
+      "VIDEO_RESPONSIVE",
+      "VIDEO_TRUE_VIEW_IN_DISPLAY",
+      "VIDEO_TRUE_VIEW_IN_STREAM"
+    )
     AND campaign.bidding_strategy_type IN (
-	"MAXIMIZE_CONVERSIONS",
-	"TARGET_CPA"
+      "MAXIMIZE_CONVERSIONS",
+      "TARGET_CPA"
     )
