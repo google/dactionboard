@@ -29,7 +29,7 @@ WITH
         LEFT JOIN {bq_project}.{bq_dataset}.targeting_topics AS T
             ON M.campaign_id = T.ad_group_id
         INNER JOIN GeoConstants AS GT
-          ON CAST( SPLIT(C.location, "/")[OFFSET(1)] AS INT64) = GT.constant_id
+          ON CAST( SPLIT(C.location, "/")[SAFE_OFFSET(1)] AS INT64) = GT.constant_id
         GROUP BY 1, 2
     )
 SELECT
@@ -40,6 +40,7 @@ SELECT
     M.campaign_id,
     M.campaign_name,
     M.campaign_status,
+    M.bidding_strategy,
     M.ad_group_id,
     M.ad_group_name,
     M.ad_group_status,
@@ -82,4 +83,4 @@ LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets2
 LEFT JOIN TargetingTable AS TT
     ON M.campaign_id = TT.campaign_id
         AND M.ad_group_id = TT.ad_group_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22);
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);

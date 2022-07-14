@@ -2,11 +2,11 @@ CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.geo_performance_F
 AS (
 WITH
     GeoConstants AS (
-	SELECT DISTINCT
-	   constant_id,
-           country_code,
- 	   name
-	FROM {bq_project}.{bq_dataset}.geo_target_constant
+      SELECT DISTINCT
+        constant_id,
+        country_code,
+        name
+      FROM {bq_project}.{bq_dataset}.geo_target_constant
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
@@ -16,6 +16,7 @@ SELECT
     M.campaign_id,
     M.campaign_name,
     M.campaign_status,
+    M.bidding_strategy,
     M.ad_group_id,
     M.ad_group_name,
     M.ad_group_status,
@@ -34,4 +35,4 @@ INNER JOIN {bq_project}.{bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
 INNER JOIN GeoConstants AS GT
   ON AP.country_criterion_id = GT.constant_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
