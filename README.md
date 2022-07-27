@@ -6,7 +6,7 @@ Key pillars of dActionBoard:
 
 * High level overview of Video Action campaigns performance
 * Deep dive analysis (by age, gender, geo, devices, etc.)
-* Overview of creative excellence and ways of improving campaign performance based on Google recommendations 
+* Overview of creative excellence and ways of improving campaign performance based on Google recommendations
 * Video level analytics
 
 
@@ -21,11 +21,14 @@ Key pillars of dActionBoard:
     if you already have such file you may skip this step.
 
 
-## Running queries
+## Running queries locally
+
+### Run with individual parameters
 
 1. Specify enviromental variables
 
 ```
+export GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
 export CUSTOMER_ID=
 export BQ_PROJECT=
 export BQ_DATASET=
@@ -33,8 +36,9 @@ export START_DATE=
 export END_DATE=
 ```
 
-`START_DATE` and `END_DATE` should be specified in `YYYY-MM-DD` format (i.e. 2022-01-01).
-`CUSTOMER_ID` should be specifed in `1234567890` format (no dashes between digits).
+* `GOOGLE_APPLICATION_CREDENTIALS` - path to json file containing [service account key](https://cloud.google.com/docs/authentication/getting-started).
+* `CUSTOMER_ID` should be specifed in `1234567890` format (no dashes between digits).
+* `START_DATE` and `END_DATE` should be specified in `YYYY-MM-DD` format (i.e. 2022-01-01) or as `:YYYYMMDD-N` macro (where N is a number of days ago, i.e., :YYYYMMDD-7 means 7 days ago).
 
 2. Run `gaarf` command to fetch Google Ads data and store them in BigQuery
 
@@ -57,6 +61,44 @@ gaarf-bq bq_queries/*.sql \
     --macro.bq_project=$BQ_PROJECT \
     --macro.bq_dataset=$BQ_DATASET
 ```
+
+### Run with config
+
+The repository contains `config.yaml.template` file where we can specify all parameters.
+Make a copy of this template (rename to something like `dactionboard-config.yaml`), replace placeholders inside new file and use on command line like that:
+
+```
+gaarf google_ads_queries/*/*.sql -c=dactionboard-config.yaml \
+    --ads-config=path/to/google-ads.yaml
+gaarf-bq bq_queries/*.sql -c=dactionboard-config.yaml
+```
+
+## Run queries in a Docker container
+
+You can run dActionBoard queries inside a Docker container.
+
+1. Build `dactionboard` image:
+
+```
+sudo docker build . -t dactionboard
+```
+
+It will create `dactionboard` docker image you can use later on. It expectes the following inputs:
+    * `google-ads.yaml` - absolute path to `google-ads.yaml` file
+    * `service_account.json` - absolute path to service account json file
+    * `config.yaml` - absolute path to YAML config
+
+2. Run:
+
+```
+sudo docker run \
+    -v /path/to/google-ads.yaml:/google-ads.yaml \
+    -v /path/to/service_account.json:/service_account.json \
+    -v /path/to/gaarf_config.yaml:/config.yaml \
+    dactionboard
+```
+
+> Don't forget to change /path/to/google-ads.yaml and /path/to/service_account.json with valid paths.
 
 ## Disclaimer
 This is not an officially supported Google product.
