@@ -19,5 +19,9 @@ SELECT
     metrics.conversions AS conversions
 FROM campaign
 WHERE campaign.advertising_channel_type = "VIDEO"
+    AND campaign.bidding_strategy_type IN (
+        "MAXIMIZE_CONVERSIONS",
+        "TARGET_CPA"
+    )
     AND segments.date >= "{start_date}"
     AND segments.date <= "{end_date}"
