@@ -141,17 +141,36 @@ WITH
         FROM `{bq_project}.{bq_dataset}.conversion_action`
         WHERE include_in_conversions
     ),
-    CampaignNonWebPageConversionTrackingTable AS (
-        SELECT
-            C.campaign_id AS campaign_id,
-            SPLIT(conversion_id, "/")[SAFE_OFFSET(3)] AS conversion_id
-        FROM `{bq_project}.{bq_dataset}.campaign` AS C,
-        UNNEST([selective_optimization_conversion_actions]) AS conversion_id
+    CampaignNonWebPageConversionTrackingSelectiveOptimizationTable AS (
+        SELECT DISTINCT
+            campaign_id
+        FROM `{bq_project}.{bq_dataset}.campaign`,
+        UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
         WHERE conversion_id NOT IN (
             SELECT DISTINCT
                 CAST(conversion_id AS STRING)
               FROM `{bq_project}.{bq_dataset}.conversion_action`
         )
+    ),
+    CampaignNonWebPageConversionTrackingCustomGoalsTable AS (
+        SELECT DISTINCT
+            campaign_id
+        FROM `{bq_project}.{bq_dataset}.conversion_goal_campaign_config`,
+        UNNEST(SPLIT(actions, "|")) AS conversion_id
+        WHERE conversion_id NOT IN (
+            SELECT DISTINCT
+                CAST(conversion_id AS STRING)
+              FROM `{bq_project}.{bq_dataset}.conversion_action`
+        )
+    ),
+    CampaignNonWebPageConversionTrackingTable AS (
+        SELECT
+            campaign_id
+        FROM CampaignNonWebPageConversionTrackingCustomGoalsTable
+        UNION DISTINCT
+        SELECT
+            campaign_id
+        FROM CampaignNonWebPageConversionTrackingSelectiveOptimizationTable
     ),
     WebPageConversionTrackingtable AS (
         SELECT
