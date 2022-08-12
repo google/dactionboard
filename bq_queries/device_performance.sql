@@ -23,5 +23,5 @@ SELECT
     ROUND(SUM(AP.cost) / 1e6) AS cost
 FROM {bq_project}.{bq_dataset}.ad_performance AS AP
 INNER JOIN {bq_project}.{bq_dataset}.mapping AS M
-  ON AP.campaign_id = M.campaign_id
+  ON AP.ad_group_id = M.ad_group_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);
