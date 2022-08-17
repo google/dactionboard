@@ -1,0 +1,18 @@
+gaarf:
+  output: bq
+  bq:
+    project: YOUR-BQ-PROJECT
+    dataset: YOUR-BQ-DATASET
+  api_version: 10
+  account: 'MCC-ID'
+  params:
+    macro:
+      start_date: ":YYYYMMDD-7"
+      end_date: ":YYYYMMDD-1"
+gaarf-bq:
+  project: YOUR-BQ-PROJECT
+  target: YOUR-BQ-DATASET
+  params:
+    macro:
+      bq_project: YOUR-BQ-PROJECT
+      bq_dataset: YOUR-BQ-DATASET
