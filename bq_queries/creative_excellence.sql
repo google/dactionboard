@@ -142,26 +142,28 @@ WITH
         WHERE include_in_conversions
     ),
     CampaignNonWebPageConversionTrackingSelectiveOptimizationTable AS (
-        SELECT DISTINCT
-            campaign_id
+        SELECT
+            campaign_id,
+            COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
         FROM `{bq_project}.{bq_dataset}.campaign`,
         UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
-        WHERE conversion_id NOT IN (
-            SELECT DISTINCT
-                CAST(conversion_id AS STRING)
-              FROM `{bq_project}.{bq_dataset}.conversion_action`
-        )
+        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS WebPageConversions
+            ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
+        WHERE selective_optimization_conversion_actions != ""
+        GROUP BY 1
+        HAVING n_webpage_conversions = 0
     ),
     CampaignNonWebPageConversionTrackingCustomGoalsTable AS (
-        SELECT DISTINCT
-            campaign_id
+        SELECT
+            campaign_id,
+            COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
         FROM `{bq_project}.{bq_dataset}.conversion_goal_campaign_config`,
         UNNEST(SPLIT(actions, "|")) AS conversion_id
-        WHERE conversion_id NOT IN (
-            SELECT DISTINCT
-                CAST(conversion_id AS STRING)
-              FROM `{bq_project}.{bq_dataset}.conversion_action`
-        )
+        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS WebPageConversions
+            ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
+        WHERE actions != ""
+        GROUP BY 1
+        HAVING n_webpage_conversions = 0
     ),
     CampaignNonWebPageConversionTrackingTable AS (
         SELECT
