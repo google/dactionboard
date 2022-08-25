@@ -27,11 +27,11 @@ SELECT
     ROUND(AM.youtube_video_duration / 1000) AS video_duration,
     AP.conversion_name,
     SUM(P.cost / 1e6) AS cost,
-    SUM(AP.all_conversions) AS all_conversions,
-    SUM(AP.conversions) AS conversions,
-    SUM(AP.view_through_conversions) AS view_through_conversions
-FROM {bq_project}.{bq_dataset}.conversion_split AS AP
-INNER JOIN PerformanceTable AS P
+    SUM(IFNULL(AP.all_conversions, 0)) AS all_conversions,
+    SUM(IFNULL(AP.conversions, 0)) AS conversions,
+    SUM(IFNULL(AP.view_through_conversions, 0)) AS view_through_conversions
+FROM PerformanceTable AS P
+LEFT JOIN {bq_project}.{bq_dataset}.conversion_split AS AP
     USING(ad_group_id, date, ad_id)
 INNER JOIN {bq_project}.{bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
