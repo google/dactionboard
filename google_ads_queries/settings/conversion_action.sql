@@ -7,4 +7,4 @@ SELECT
     conversion_action.type AS type,
     conversion_action.category AS category
 FROM conversion_action
-WHERE conversion_action.type = "WEBPAGE"
+WHERE conversion_action.origin = "WEBSITE"
