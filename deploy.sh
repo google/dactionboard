@@ -1,24 +1,20 @@
 #!/bin/bash
+COLOR='\033[0;36m' # Cyan
+NC='\033[0m' # No color
+
 solution_name="dActionBoard"
 solution_name_lowercase=$(echo $solution_name | tr '[:upper:]' '[:lower:]' |\
 	tr ' ' '_')
 
-welcome() {
-echo "Welcome to installation of $solution_name"
-	if [[ -f "$solution_name_lowercase.config" ]]; then
-		read_config
-		echo "Found saved configuration at $solution_name_lowercase.config"
-		print_configuration
-		echo -n "Do you want to use it (Y/n): "
-		read -r setup_config_answer
-		if [[ $setup_config_answer = "Y" ]]; then
-			echo "Using saved configuration..."
-		else
-			echo "Creating new configuration..."
-			setup
-		fi
+# Specify customer ids query that fetch data only from accounts that have at least one app campaign in them.
+customer_ids_query='SELECT customer.id FROM ad_group WHERE ad_group.type IN ("VIDEO_RESPONSIVE", "VIDEO_TRUE_VIEW_IN_DISPLAY", "VIDEO_TRUE_VIEW_IN_STREAM") AND campaign.bidding_strategy_type IN ("MAXIMIZE_CONVERSIONS", "TARGET_CPA")'
+
+check_ads_config() {
+	if [[ -f "$HOME/google-ads.yaml" ]]; then
+		ads_config=$HOME/google-ads.yaml
 	else
-		setup
+		echo -n "Enter full path to google-ads.yaml file: "
+		read -r ads_config
 	fi
 }
 
@@ -45,35 +41,14 @@ setup() {
 	echo -n "Do you want to save this config (Y/n): "
 	read -r save_config_answer
 	if [[ $save_config_answer = "Y" ]]; then
-		save_config
+		save_config="--save-config --config-destination=$solution_name_lowercase.yaml"
 	fi
 	print_configuration
 }
 
-save_config() {
-	declare -A setup_config
-	setup_config["customer_id"]=$customer_id
-	setup_config["project"]=$project
-	setup_config["bq_dataset"]=$bq_dataset
-	setup_config["start_date"]=$start_date
-	setup_config["end_date"]=$end_date
-	setup_config["ads_config"]=$ads_config
-	declare -p setup_config > "$solution_name_lowercase.config"
-}
-
-read_config() {
-	declare -A config
-	source -- "$solution_name_lowercase.config"
-	customer_id=${setup_config["customer_id"]}
-	project=${setup_config["project"]}
-	bq_dataset=${setup_config["bq_dataset"]}
-	start_date=${setup_config["start_date"]}
-	end_date=${setup_config["end_date"]}
-	ads_config=${setup_config["ads_config"]}
-}
 
 deploy() {
-	echo -n "Deploy $solution_name? Y/n/q: "
+	echo -n -e "${COLOR}Deploy $solution_name? Y/n/q: ${NC}"
 	read -r answer
 
 	if [[ $answer = "Y" ]]; then
@@ -92,19 +67,20 @@ generate_parameters() {
 
 
 fetch_reports() {
-	echo "===fetching reports==="
+	echo -e "${COLOR}===fetching reports===${NC}"
 	gaarf google_ads_queries/*/*.sql \
 	--account=$customer_id \
 	--output=bq \
+	--customer-ids-query="$customer_ids_query" \
 	--bq.project=$project --bq.dataset=$bq_dataset \
 	--macro.start_date=$start_date --macro.end_date=$end_date \
-	--ads-config=$ads_config
+	--ads-config=$ads_config "$@"
 }
 
 generate_output_tables() {
-	echo "===generating final tables==="
+	echo -e "${COLOR}===generating final tables===${NC}"
 	gaarf-bq bq_queries/*.sql \
-		--project=$project --target=$bq_dataset $macros
+		--project=$project --target=$bq_dataset $macros "$@"
 }
 
 print_configuration() {
@@ -117,16 +93,39 @@ print_configuration() {
 	echo "	Ads config: $ads_config"
 }
 
+welcome() {
+	echo -e "${COLOR}Welcome to installation of $solution_name${NC} "
+}
+
 get_input() {
-	welcome
+	setup
 	deploy
 }
 
-if [[ -f "$solution_name_lowercase.config"  && "$1" = "-s" ]]; then
-	read_config
+
+run_with_config() {
+	echo -e "${COLOR}===fetching reports===${NC}"
+	gaarf google_ads_queries/**/*.sql -c=$solution_name_lowercase.yaml \
+		--ads-config=$ads_config
+	echo -e "${COLOR}===generating final tables===${NC}"
+	gaarf-bq bq_queries/*.sql -c=$solution_name_lowercase.yaml
+
+}
+
+welcome
+check_ads_config
+
+if [[ -f "$solution_name_lowercase.yaml" ]]; then
+	echo -e "${COLOR}Found saved configuration at $solution_name_lowercase.yaml${NC}"
+	cat $solution_name_lowercase.yaml
+	echo -n -e "${COLOR}Do you want to use it (Y/n): ${NC}"
+	read -r setup_config_answer
+	if [[ $setup_config_answer = "Y" ]]; then
+		echo -e "${COLOR}Using saved configuration...${NC}"
+	fi
+	run_with_config
 else
 	get_input
+	fetch_reports $save_config
+	generate_output_tables $save_config
 fi
-
-fetch_reports
-generate_output_tables
