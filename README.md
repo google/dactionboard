@@ -108,11 +108,13 @@ export DACTIONBOARD_BQ_PROJECT=
 export DACTIONBOARD_BQ_DATASET=
 export DACTIONBOARD_START_DATE=
 export DACTIONBOARD_END_DATE=
+export DACTIONBOARD_API_VERSION=10
 ```
 
 * `GOOGLE_APPLICATION_CREDENTIALS` - check Service Account Section in [prerequisites](#prerequisites).
 * `DACTIONBOARD_CUSTOMER_ID` should be specified in `1234567890` format (no dashes between digits).
 * `DACTIONBOARD_START_DATE` and `DACTIONBOARD_END_DATE` should be specified in `YYYY-MM-DD` format (i.e. 2022-01-01) or as `:YYYYMMDD-N` macro (where N is a number of days ago, i.e., :YYYYMMDD-7 means 7 days ago).
+* Please note that `DACTIONBOARD_API_VERSION` version is set to 10 in order to ensure the compatibility of queries in the project with this particular API version.
 
 2. Run `gaarf` command to fetch Google Ads data and store them in BigQuery
 
@@ -124,6 +126,7 @@ gaarf google_ads_queries/*/*.sql \
     --bq.dataset=$DACTIONBOARD_BQ_DATASET \
     --macro.start_date=$DACTIONBOARD_START_DATE \
     --macro.end_date=$DACTIONBOARD_END_DATE \
+    --api-version=$DACTIONBOARD_API_VERSION \
     --ads-config=path/to/google-ads.yaml
 ```
 

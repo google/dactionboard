@@ -3,6 +3,7 @@ gaarf:
   bq:
     project: YOUR-BQ-PROJECT
     dataset: YOUR-BQ-DATASET
+  # Do not change API version manually
   api_version: 10
   account: 'MCC-ID'
   params:
