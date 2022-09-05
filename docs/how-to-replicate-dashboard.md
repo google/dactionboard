@@ -25,26 +25,26 @@ In order to replicate a datasource, please do the following:
 * Click on the datasource link above.
 * Click on *Make a copy of this datasource*
 
-	![make_copy_datasource](src/make_copy_datasource.png =700x)
+	![make_copy_datasource](src/make_copy_datasource.png)
 
 * Confirm copying by clicking *Copy Data Source*
 
-	![confirm](src/copy_confirm.png =400x)
+	![confirm](src/copy_confirm.png)
 
 * Select *MY PROJECTS* and either pick a project or enter project id manually (this should be the project where dActionBoard tables are located)
 * In Dataset select a BQ dataset where dActionBoard tables are located
 
-	![setup project](src/setup_project.png =600x)
+	![setup project](src/setup_project.png)
 * Select a table from the dataset which the name similar to Data Source name (i.e., if Data Source is called Video Conversion Split look for the table which is called video_conversion_split)
 
-	![select table](src/select_table.png =600x)
+	![select table](src/select_table.png)
 
 * Confirm copying by clicking *RECONNECT* button.
 
-	![reconnect](src/reconnect.png =150x)
+	![reconnect](src/reconnect.png)
 
 
-> Don’t forget to rename the datasource so you can find them easily. I.e. such name as *Copy of Template dActionBoard Video Performance* is a bit mouthful, you can name it simply *dActionBoard Video Performance* or *YOUR-COMPANY-NAME dActionBoard Video Performance*.
+> Don’t forget to rename the datasource so you can find it easily. I.e. such name as *Copy of Template dActionBoard Video Performance* is a bit mouthful, you can name it simply *dActionBoard Video Performance* or *YOUR-COMPANY-NAME dActionBoard Video Performance*.
 
 * Repeat the steps above for all the datasources.
 
@@ -60,11 +60,11 @@ In order to replicate dashboard please do the following:
 
 * make a [copy of the dashboard](https://support.google.com/datastudio/answer/7175478?hl=en#zippy=%2Cin-this-article) by clicking on *More options - Make a copy*.
 
-	![copy dashboard](src/copy_dashboard.png =600x)
+	![copy dashboard](src/copy_dashboard.png)
 
 * In *Copy this report* window map original datasources to the ones you created in the previous step.
 
-	![datasource association](src/datasource_association.png =600x)
+	![datasource association](src/datasource_association.png)
 
 Once all template datasources are replaced with new ones, click *Copy Report* and enjoy your new shiny dActionBoard!
 
