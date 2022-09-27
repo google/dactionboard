@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.creative_excellence_F
+CREATE OR REPLACE TABLE {output_dataset}.creative_excellence
 AS (
 WITH
     /* Creatives block */
@@ -6,21 +6,21 @@ WITH
       SELECT
           campaign_id,
           COUNT(DISTINCT ad_id) AS n_ads
-      FROM `{bq_project}.{bq_dataset}.ad_matching`
+      FROM `{bq_dataset}.ad_matching`
       GROUP BY 1
     ),
     SitelinksAdGroupTable AS (
       SELECT
           campaign_id,
           SUM(ARRAY_LENGTH(SPLIT(sitelinks, "|"))) AS n_ad_group_sitelinks
-      FROM `{bq_project}.{bq_dataset}.sitelinks_ad_group`
+      FROM `{bq_dataset}.sitelinks_ad_group`
       GROUP BY 1
     ),
     SitelinksCampaignTable AS (
       SELECT
           campaign_id,
           SUM(ARRAY_LENGTH(SPLIT(sitelinks, "|"))) AS n_campaign_sitelinks
-      FROM `{bq_project}.{bq_dataset}.sitelinks_campaign`
+      FROM `{bq_dataset}.sitelinks_campaign`
       GROUP BY 1
     ),
     SitelinksTable AS (
@@ -41,7 +41,7 @@ WITH
             custom_audience,
             user_list,
             "ad_group" AS level
-        FROM `{bq_project}.{bq_dataset}.ad_group_criterion`
+        FROM `{bq_dataset}.ad_group_criterion`
         WHERE type = "CUSTOM_AUDIENCE"
     ),
     AudienceCampaignTable AS (
@@ -51,7 +51,7 @@ WITH
             custom_audience,
             user_list,
             "campaign" AS level
-        FROM `{bq_project}.{bq_dataset}.campaign_criterion`
+        FROM `{bq_dataset}.campaign_criterion`
         WHERE type = "CUSTOM_AUDIENCE"
     ),
     AudienceTable AS (
@@ -63,7 +63,7 @@ WITH
         SELECT DISTINCT
             A.customer_id
         FROM AudienceTable AS A
-        LEFT JOIN `{bq_project}.{bq_dataset}.custom_audience` AS C
+        LEFT JOIN `{bq_dataset}.custom_audience` AS C
             ON SPLIT(A.custom_audience, "/")[SAFE_OFFSET(3)] = CAST(C.audience_id AS STRING)
         WHERE C.type = "SEARCH"
     ),
@@ -73,7 +73,7 @@ WITH
     ),
     CampaignOptimizedTargetingCriteria AS (
         SELECT DISTINCT customer_id, campaign_id
-        FROM `{bq_project}.{bq_dataset}.ad_group_criterion`
+        FROM `{bq_dataset}.ad_group_criterion`
         WHERE is_auto_targeting
     ),
     OptimizedTargetingCriteria AS (
@@ -112,7 +112,7 @@ WITH
                 total_budget / (
                     DATE_DIFF(DATE(end_date), DATE(start_date), DAY))
                   ) AS daily_budget
-        FROM `{bq_project}.{bq_dataset}.campaign`
+        FROM `{bq_dataset}.campaign`
     ),
     BidBudgetTable AS (
         SELECT
@@ -139,7 +139,7 @@ WITH
             customer_id,
             conversion_id,
             include_in_conversions
-        FROM `{bq_project}.{bq_dataset}.conversion_action`
+        FROM `{bq_dataset}.conversion_action`
         WHERE
             origin = "WEBSITE" AND tag_snippets != ""
             OR type = "WEBPAGE"
@@ -155,9 +155,9 @@ WITH
         SELECT
             campaign_id,
             COUNT(DISTINCT AllConversions.conversion_id) AS n_conversions
-        FROM `{bq_project}.{bq_dataset}.campaign`,
+        FROM `{bq_dataset}.campaign`,
         UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
-        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS AllConversions
+        LEFT JOIN `{bq_dataset}.conversion_action` AS AllConversions
             ON conversion_id = CAST(AllConversions.conversion_id AS STRING)
         WHERE selective_optimization_conversion_actions != ""
         GROUP BY 1
@@ -166,9 +166,9 @@ WITH
         SELECT
             campaign_id,
             COUNT(DISTINCT AllConversions.conversion_id) AS n_conversions
-        FROM `{bq_project}.{bq_dataset}.conversion_goal_campaign_config`,
+        FROM `{bq_dataset}.conversion_goal_campaign_config`,
         UNNEST(SPLIT(actions, "|")) AS conversion_id
-        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS AllConversions
+        LEFT JOIN `{bq_dataset}.conversion_action` AS AllConversions
             ON conversion_id = CAST(AllConversions.conversion_id AS STRING)
         WHERE actions != ""
         GROUP BY 1
@@ -177,9 +177,9 @@ WITH
         SELECT
             campaign_id,
             COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
-        FROM `{bq_project}.{bq_dataset}.campaign`,
+        FROM `{bq_dataset}.campaign`,
         UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
-        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS WebPageConversions
+        LEFT JOIN `{bq_dataset}.conversion_action` AS WebPageConversions
             ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
         WHERE selective_optimization_conversion_actions != ""
         GROUP BY 1
@@ -188,9 +188,9 @@ WITH
         SELECT
             campaign_id,
             COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
-        FROM `{bq_project}.{bq_dataset}.conversion_goal_campaign_config`,
+        FROM `{bq_dataset}.conversion_goal_campaign_config`,
         UNNEST(SPLIT(actions, "|")) AS conversion_id
-        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS WebPageConversions
+        LEFT JOIN `{bq_dataset}.conversion_action` AS WebPageConversions
             ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
         WHERE actions != ""
         GROUP BY 1
@@ -224,7 +224,7 @@ WITH
                 TRUE,
                 IFNULL(is_account_webpage_tracking, FALSE)
                     AND CN.campaign_id IS NULL) AS is_webpage_tracking
-        FROM `{bq_project}.{bq_dataset}.campaign` AS C
+        FROM `{bq_dataset}.campaign` AS C
         LEFT JOIN CampaignAllConversionTrackingTable AS CN
             USING(campaign_id)
         LEFT JOIN CampaignWebPageConversionTrackingTable AS CW
@@ -259,7 +259,7 @@ WITH
         TRUE, FALSE
           ) AS is_creative_optimized,
           cost
-         FROM `{bq_project}.{bq_dataset}.campaign` AS C
+         FROM `{bq_dataset}.campaign` AS C
          LEFT JOIN WebPageConversionTrackingtable AS W
             USING(campaign_id)
          LEFT JOIN BidBudgetTable AS B
@@ -281,7 +281,7 @@ WITH
         campaign_name,
         campaign_status,
         bidding_strategy,
-      FROM {bq_project}.{bq_dataset}.mapping
+      FROM {bq_dataset}.mapping
     )
 SELECT
     M.account_id,

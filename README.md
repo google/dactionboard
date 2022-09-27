@@ -76,7 +76,7 @@ If you setup dActionBoard it's highly recommended to run an interactive installe
 Please run the following command in your terminal:
 
 ```
-bash deploy.sh
+bash run-local.sh
 ```
 
 It will guide you through a series of questions to get all necessary parameters to run the scripts:
@@ -88,8 +88,8 @@ It will guide you through a series of questions to get all necessary parameters 
 * `end date` - last date from which you want to get performance data (i.e., `2022-12-31`)
 * `Ads config` - path to `google-ads.yaml` file.
 
-After the initial run of `deploy.sh` command it will generate `dactionboard.yaml` config file with all necessary information used for future runs.\
-When you run `bash deploy.sh` next time it will automatically pick up created configuration.
+After the initial run of `run-local.sh` command it will generate `dactionboard.yaml` config file with all necessary information used for future runs.\
+When you run `bash run-local.sh` next time it will automatically pick up created configuration.
 This configuration file can also be used when [running queries with config](#run-with-config) or [running queries in a Docker container](#run-queries-in-a-docker-container).
 
 #### Running queries locally
@@ -106,6 +106,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
 export DACTIONBOARD_CUSTOMER_ID=
 export DACTIONBOARD_BQ_PROJECT=
 export DACTIONBOARD_BQ_DATASET=
+export DACTIONBOARD_OUTPUT_DATASET=
 export DACTIONBOARD_START_DATE=
 export DACTIONBOARD_END_DATE=
 export DACTIONBOARD_API_VERSION=10
@@ -141,9 +142,8 @@ fetched by `gaarf` command.
 ```
 gaarf-bq bq_queries/*.sql \
     --project=$DACTIONBOARD_BQ_PROJECT \
-    --target=$DACTIONBOARD_BQ_DATASET \
-    --macro.bq_project=$DACTIONBOARD_BQ_PROJECT \
-    --macro.bq_dataset=$DACTIONBOARD_BQ_DATASET
+    --macro.bq_dataset=$DACTIONBOARD_BQ_DATASET \
+    --macro.output_dataset=$DACTIONBOARD_OUTPUT_DATASET
 ```
 
 As in the step 2 you can run a single query from `bq_folder` if needed.

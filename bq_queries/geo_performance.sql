@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.geo_performance_F
+CREATE OR REPLACE TABLE {output_dataset}.geo_performance
 AS (
 WITH
     GeoConstants AS (
@@ -6,7 +6,7 @@ WITH
         constant_id,
         country_code,
         name
-      FROM {bq_project}.{bq_dataset}.geo_target_constant
+      FROM {bq_dataset}.geo_target_constant
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
@@ -30,8 +30,8 @@ SELECT
     SUM(AP.view_through_conversions) AS view_through_conversions,
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
-FROM {bq_project}.{bq_dataset}.geo_performance AS AP
-INNER JOIN {bq_project}.{bq_dataset}.mapping AS M
+FROM {bq_dataset}.geo_performance AS AP
+INNER JOIN {bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
 INNER JOIN GeoConstants AS GT
   ON AP.country_criterion_id = GT.constant_id

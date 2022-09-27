@@ -1,4 +1,4 @@
-CREATE OR REPLACE TABLE {bq_project}.{bq_dataset}.ad_video_performance_F
+CREATE OR REPLACE TABLE {output_dataset}.ad_video_performance
 AS (
 WITH
     GeoConstants AS (
@@ -6,7 +6,7 @@ WITH
             constant_id,
             country_code,
             name
-        FROM {bq_project}.{bq_dataset}.geo_target_constant
+        FROM {bq_dataset}.geo_target_constant
     ),
     TargetingTable AS (
         SELECT
@@ -17,16 +17,16 @@ WITH
             ARRAY_AGG(DISTINCT IFNULL(CA.display_name, "")) AS campaign_audiences,
             ARRAY_AGG(DISTINCT IFNULL(AA.display_name, "")) AS ad_group_audiences,
             ARRAY_AGG(DISTINCT IFNULL(T.topic, "")) AS topics
-        FROM {bq_project}.{bq_dataset}.mapping AS M
-        LEFT JOIN {bq_project}.{bq_dataset}.targeting_devices AS D
+        FROM {bq_dataset}.mapping AS M
+        LEFT JOIN {bq_dataset}.targeting_devices AS D
             ON M.campaign_id = D.campaign_id
-        LEFT JOIN {bq_project}.{bq_dataset}.targeting_country AS C
+        LEFT JOIN {bq_dataset}.targeting_country AS C
             ON M.campaign_id = C.campaign_id
-        LEFT JOIN {bq_project}.{bq_dataset}.targeting_audiences_campaign AS CA
+        LEFT JOIN {bq_dataset}.targeting_audiences_campaign AS CA
             ON M.campaign_id = CA.campaign_id
-        LEFT JOIN {bq_project}.{bq_dataset}.targeting_audiences_adgroup AS AA
+        LEFT JOIN {bq_dataset}.targeting_audiences_adgroup AS AA
             ON M.ad_group_id = AA.ad_group_id
-        LEFT JOIN {bq_project}.{bq_dataset}.targeting_topics AS T
+        LEFT JOIN {bq_dataset}.targeting_topics AS T
             ON M.campaign_id = T.ad_group_id
         INNER JOIN GeoConstants AS GT
           ON CAST( SPLIT(C.location, "/")[SAFE_OFFSET(1)] AS INT64) = GT.constant_id
@@ -69,16 +69,16 @@ SELECT
     SUM(AP.view_through_conversions) AS view_through_conversions,
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
-FROM {bq_project}.{bq_dataset}.ad_performance AS AP
-INNER JOIN {bq_project}.{bq_dataset}.ad_matching AS AM
+FROM {bq_dataset}.ad_performance AS AP
+INNER JOIN {bq_dataset}.ad_matching AS AM
   ON AP.ad_id = AM.ad_id
-LEFT JOIN {bq_project}.{bq_dataset}.video_headlines_call_to_actions AS V
+LEFT JOIN {bq_dataset}.video_headlines_call_to_actions AS V
   ON AP.ad_id = V.ad_id
-LEFT JOIN {bq_project}.{bq_dataset}.mapping AS M
+LEFT JOIN {bq_dataset}.mapping AS M
   ON AP.ad_group_id = M.ad_group_id
-LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets
+LEFT JOIN {bq_dataset}.asset_mapping AS Assets
   ON V.in_stream_companion_banner = CAST(Assets.asset_id AS STRING)
-LEFT JOIN {bq_project}.{bq_dataset}.asset_mapping AS Assets2
+LEFT JOIN {bq_dataset}.asset_mapping AS Assets2
   ON V.responsive_companion_banner = CAST(Assets2.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
     ON M.campaign_id = TT.campaign_id

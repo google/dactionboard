@@ -64,7 +64,8 @@ deploy() {
 }
 
 generate_parameters() {
-	macros="--macro.bq_project=$project --macro.bq_dataset=$bq_dataset"
+	bq_dataset_output=$(echo $bq_dataset"_output")
+	macros="--macro.bq_project=$project --macro.bq_dataset=$bq_dataset --macro.output_dataset=$bq_dataset_output"
 }
 
 

@@ -15,5 +15,4 @@ gaarf-bq:
   target: YOUR-BQ-DATASET
   params:
     macro:
-      bq_project: YOUR-BQ-PROJECT
       bq_dataset: YOUR-BQ-DATASET
