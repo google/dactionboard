@@ -134,14 +134,46 @@ WITH
         FROM BudgetDailyTable
     ),
     /*Website Conversion Tracking Block*/
+    WebPageConversionsTable AS (
+        SELECT
+            customer_id,
+            conversion_id,
+            include_in_conversions
+        FROM `{bq_project}.{bq_dataset}.conversion_action`
+        WHERE
+            origin = "WEBSITE" AND tag_snippets != ""
+            OR type = "WEBPAGE"
+    ),
     AccountWebPageConversionTrackingTable AS (
         SELECT DISTINCT
             customer_id,
             TRUE AS is_account_webpage_tracking
-        FROM `{bq_project}.{bq_dataset}.conversion_action`
+        FROM WebPageConversionsTable
         WHERE include_in_conversions
     ),
-    CampaignNonWebPageConversionTrackingSelectiveOptimizationTable AS (
+    CampaignAllConversionTrackingSelectiveOptimizationTable AS (
+        SELECT
+            campaign_id,
+            COUNT(DISTINCT AllConversions.conversion_id) AS n_conversions
+        FROM `{bq_project}.{bq_dataset}.campaign`,
+        UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
+        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS AllConversions
+            ON conversion_id = CAST(AllConversions.conversion_id AS STRING)
+        WHERE selective_optimization_conversion_actions != ""
+        GROUP BY 1
+    ),
+    CampaignAllConversionTrackingCustomGoalsTable AS (
+        SELECT
+            campaign_id,
+            COUNT(DISTINCT AllConversions.conversion_id) AS n_conversions
+        FROM `{bq_project}.{bq_dataset}.conversion_goal_campaign_config`,
+        UNNEST(SPLIT(actions, "|")) AS conversion_id
+        LEFT JOIN `{bq_project}.{bq_dataset}.conversion_action` AS AllConversions
+            ON conversion_id = CAST(AllConversions.conversion_id AS STRING)
+        WHERE actions != ""
+        GROUP BY 1
+    ),
+    CampaignWebPageConversionTrackingSelectiveOptimizationTable AS (
         SELECT
             campaign_id,
             COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
@@ -151,9 +183,8 @@ WITH
             ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
         WHERE selective_optimization_conversion_actions != ""
         GROUP BY 1
-        HAVING n_webpage_conversions = 0
     ),
-    CampaignNonWebPageConversionTrackingCustomGoalsTable AS (
+    CampaignWebPageConversionTrackingCustomGoalsTable AS (
         SELECT
             campaign_id,
             COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
@@ -163,27 +194,40 @@ WITH
             ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
         WHERE actions != ""
         GROUP BY 1
-        HAVING n_webpage_conversions = 0
     ),
-    CampaignNonWebPageConversionTrackingTable AS (
+    CampaignAllConversionTrackingTable AS (
         SELECT
             campaign_id
-        FROM CampaignNonWebPageConversionTrackingCustomGoalsTable
+        FROM CampaignAllConversionTrackingCustomGoalsTable
+        WHERE n_conversions > 0
         UNION DISTINCT
         SELECT
             campaign_id
-        FROM CampaignNonWebPageConversionTrackingSelectiveOptimizationTable
+        FROM CampaignAllConversionTrackingSelectiveOptimizationTable
+        WHERE n_conversions > 0
+    ),
+    CampaignWebPageConversionTrackingTable AS (
+        SELECT
+            campaign_id
+        FROM CampaignWebPageConversionTrackingCustomGoalsTable
+        WHERE n_webpage_conversions > 0
+        UNION DISTINCT
+        SELECT
+            campaign_id
+        FROM CampaignWebPageConversionTrackingSelectiveOptimizationTable
+        WHERE n_webpage_conversions > 0
     ),
     WebPageConversionTrackingtable AS (
         SELECT
             campaign_id,
-            IFNULL(
-                IF(CN.campaign_id IS NOT NULL,
-                    FALSE,
-                    is_account_webpage_tracking),
-                            FALSE) AS is_webpage_tracking
+            IF(CW.campaign_id IS NOT NULL,
+                TRUE,
+                IFNULL(is_account_webpage_tracking, FALSE)
+                    AND CN.campaign_id IS NULL) AS is_webpage_tracking
         FROM `{bq_project}.{bq_dataset}.campaign` AS C
-        LEFT JOIN CampaignNonWebPageConversionTrackingTable AS CN
+        LEFT JOIN CampaignAllConversionTrackingTable AS CN
+            USING(campaign_id)
+        LEFT JOIN CampaignWebPageConversionTrackingTable AS CW
             USING(campaign_id)
         LEFT JOIN AccountWebPageConversionTrackingTable AS A
             USING(customer_id)

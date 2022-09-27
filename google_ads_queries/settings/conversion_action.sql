@@ -5,6 +5,7 @@ SELECT
     conversion_action.name AS name,
     conversion_action.status AS status,
     conversion_action.type AS type,
-    conversion_action.category AS category
+    conversion_action.origin AS origin,
+    conversion_action.category AS category,
+    conversion_action.tag_snippets AS tag_snippets
 FROM conversion_action
-WHERE conversion_action.origin = "WEBSITE"
