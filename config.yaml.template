@@ -12,7 +12,6 @@ gaarf:
       end_date: ":YYYYMMDD-1"
 gaarf-bq:
   project: YOUR-BQ-PROJECT
-  target: YOUR-BQ-DATASET
   params:
     macro:
       bq_dataset: YOUR-BQ-DATASET
