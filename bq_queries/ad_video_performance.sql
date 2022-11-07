@@ -8,29 +8,63 @@ WITH
             name
         FROM {bq_dataset}.geo_target_constant
     ),
+    DevicesTable AS (
+        SELECT
+            campaign_id,
+            ARRAY_AGG(DISTINCT device_type ORDER BY device_type) AS devices
+        FROM {bq_dataset}.targeting_devices
+        GROUP BY 1
+    ),
+    LocationsTable AS (
+        SELECT
+            campaign_id,
+            ARRAY_AGG(DISTINCT GT.name ORDER BY GT.name) AS locations,
+        FROM {bq_dataset}.targeting_country AS C
+        INNER JOIN GeoConstants AS GT
+            ON CAST( SPLIT(C.location, "/")[SAFE_OFFSET(1)] AS INT64) = GT.constant_id
+        GROUP BY 1
+    ),
+    CampaignAudiencesTable AS (
+        SELECT
+            campaign_id,
+            ARRAY_AGG(DISTINCT IFNULL(display_name, "")) AS campaign_audiences
+        FROM {bq_dataset}.targeting_audiences_campaign
+        GROUP BY 1
+    ),
+    AdGroupAudiencesTable AS (
+        SELECT
+            ad_group_id,
+            ARRAY_AGG(DISTINCT IFNULL(display_name, "")) AS ad_group_audiences
+        FROM {bq_dataset}.targeting_audiences_adgroup
+        GROUP BY 1
+    ),
+    TopicsTable AS (
+        SELECT
+            ad_group_id,
+            ARRAY_AGG(DISTINCT IFNULL(topic, "")) AS topics
+        FROM {bq_dataset}.targeting_topics
+        GROUP BY 1
+    ),
     TargetingTable AS (
         SELECT
             M.campaign_id,
             M.ad_group_id,
-            ARRAY_AGG(DISTINCT D.device_type ORDER BY D.device_type) AS devices,
-            ARRAY_AGG(DISTINCT GT.name ORDER BY GT.name) AS locations,
-            ARRAY_AGG(DISTINCT IFNULL(CA.display_name, "")) AS campaign_audiences,
-            ARRAY_AGG(DISTINCT IFNULL(AA.display_name, "")) AS ad_group_audiences,
-            ARRAY_AGG(DISTINCT IFNULL(T.topic, "")) AS topics
+            devices,
+            locations,
+            campaign_audiences,
+            ad_group_audiences,
+            topics
         FROM {bq_dataset}.mapping AS M
-        LEFT JOIN {bq_dataset}.targeting_devices AS D
+        LEFT JOIN DevicesTable AS D
             ON M.campaign_id = D.campaign_id
-        LEFT JOIN {bq_dataset}.targeting_country AS C
-            ON M.campaign_id = C.campaign_id
-        LEFT JOIN {bq_dataset}.targeting_audiences_campaign AS CA
+        LEFT JOIN LocationsTable AS L
+            ON M.campaign_id = L.campaign_id
+        LEFT JOIN CampaignAudiencesTable AS CA
             ON M.campaign_id = CA.campaign_id
-        LEFT JOIN {bq_dataset}.targeting_audiences_adgroup AS AA
+        LEFT JOIN AdGroupAudiencesTable AS AA
             ON M.ad_group_id = AA.ad_group_id
-        LEFT JOIN {bq_dataset}.targeting_topics AS T
-            ON M.campaign_id = T.ad_group_id
-        INNER JOIN GeoConstants AS GT
-          ON CAST( SPLIT(C.location, "/")[SAFE_OFFSET(1)] AS INT64) = GT.constant_id
-        GROUP BY 1, 2
+        LEFT JOIN TopicsTable AS T
+            ON M.ad_group_id = T.ad_group_id
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,

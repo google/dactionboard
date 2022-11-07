@@ -1,5 +1,5 @@
 SELECT
-    campaign.id AS ad_group_id,
+    ad_group.id AS ad_group_id,
     ad_group_criterion.topic.path AS topic
 FROM ad_group_criterion
 WHERE
