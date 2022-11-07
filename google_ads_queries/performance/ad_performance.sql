@@ -5,6 +5,7 @@ SELECT
     ad_group.id AS ad_group_id,
     ad_group.type AS ad_group_type,
     ad_group_ad.ad.id AS ad_id,
+    ad_group_ad.ad.name AS ad_name,
     segments.device AS device,
     metrics.clicks AS clicks,
     metrics.impressions AS impressions,

@@ -45,6 +45,7 @@ SELECT
     M.ad_group_name,
     M.ad_group_status,
     AP.ad_id AS ad_id,
+    AP.ad_name AS ad_name,
     AM.youtube_video_id,
     AM.youtube_title AS video_title,
     ROUND(AM.youtube_video_duration/1000) AS video_duration,
@@ -83,4 +84,4 @@ LEFT JOIN {bq_dataset}.asset_mapping AS Assets2
 LEFT JOIN TargetingTable AS TT
     ON M.campaign_id = TT.campaign_id
         AND M.ad_group_id = TT.ad_group_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
