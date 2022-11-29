@@ -6,12 +6,15 @@ gaarf:
   # Do not change API version manually
   api_version: 10
   account: 'MCC-ID'
+  customer_ids_query: 'SELECT customer.id FROM ad_group WHERE ad_group.type IN ("VIDEO_RESPONSIVE", "VIDEO_TRUE_VIEW_IN_DISPLAY", "VIDEO_TRUE_VIEW_IN_STREAM") AND campaign.bidding_strategy_type IN ("MAXIMIZE_CONVERSIONS", "TARGET_CPA")'
   params:
     macro:
-      start_date: ":YYYYMMDD-7"
+      start_date: ":YYYYMMDD-30"
       end_date: ":YYYYMMDD-1"
 gaarf-bq:
   project: YOUR-BQ-PROJECT
   params:
     macro:
       bq_dataset: YOUR-BQ-DATASET
+      # separate output_dataset should be specified to simplify viewing the data in BQ
+      output_dataset: YOUR-BQ-DATASET-OUTPUT

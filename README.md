@@ -41,7 +41,7 @@ List of tables:
 * Access to repository configured. In order to clone this repository you need to do the following:
     * Visit https://professional-services.googlesource.com/new-password and login with your account
     * Once authenticated please copy all lines in box and paste them in the terminal.
-* [Service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts#creating) created and [service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating) downloaded in order to write data to BigQuery.
+* (*Optional*) If running application outside of Google Cloud console please generate [service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts#creating) and download [service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating) in order to write data to BigQuery.
     * Once you downloaded service account key export it as an environmental variable
         ```
         export GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
@@ -54,23 +54,30 @@ In order to run dActionBoard please follow the steps outlined below:
     ```
     git clone https://professional-services.googlesource.com/solutions/dactionboard
     ```
-* configure virtual environment and install a single dependency:
+* (Recommended) configure virtual environment if you starting testing the solution:
     ```
     python -m venv dactionboard
-    source app-reporting-pack/bin/activate
-    pip install google-ads-api-report-fetcher
+    source dactionboard/bin/activate
+    ```
+* install dependencies:
+    ```
+    pip install -r requirements.txt
     ```
 
 ### Usage
 
-1. [Initial setup and run via an interactive installer](#initial-setup-and-run-via-an-interactive-installer)
-2. [Running queries locally](#running-queries-locally)
-    * [With individual parameters](#run-with-individual-parameters)
-    * [With config](#run-with-config)
-3. [Running queries in a Docker container](#run-queries-in-a-docker-container)
+1. [Generate tables](#generate-tables)
+    1. [Option 1: Initial setup and run via an interactive installer](#initial-setup-and-run-via-an-interactive-installer)
+    2. [Option 2: Running queries locally](#running-queries-locally)
+        * [With individual parameters](#run-with-individual-parameters)
+        * [With config](#run-with-config)
+    3. [Option 3: Running queries in a Docker container](#run-queries-in-a-docker-container)
+2. [Create dashboard](#create-dashboard)
 
 
-#### Initial setup and run via an interactive installer
+#### Generate tables
+
+##### Initial setup and run via an interactive installer
 
 If you setup dActionBoard it's highly recommended to run an interactive installer.
 Please run the following command in your terminal:
@@ -92,9 +99,9 @@ After the initial run of `run-local.sh` command it will generate `dactionboard.y
 When you run `bash run-local.sh` next time it will automatically pick up created configuration.
 This configuration file can also be used when [running queries with config](#run-with-config) or [running queries in a Docker container](#run-queries-in-a-docker-container).
 
-#### Running queries locally
+##### Running queries locally
 
-##### Run with individual parameters
+###### Run with individual parameters
 *Back to [usage](#usage)*
 
 Running queries with CLI arguments is **generally discouraged** but might be useful if you want to re-run a particular query or a set of queries with a new parameter before adding it to config.
@@ -148,7 +155,7 @@ gaarf-bq bq_queries/*.sql \
 
 As in the step 2 you can run a single query from `bq_folder` if needed.
 
-##### Run with config
+###### Run with config
 *Back to [usage](#usage)*
 
 The repository contains `config.yaml.template` file where we can specify all parameters.
@@ -178,7 +185,7 @@ sudo docker build . -t dactionboard
 It will create `dactionboard` docker image you can use later on. It expects the following inputs:
 * `google-ads.yaml` - absolute path to `google-ads.yaml` file
 * `service_account.json` - absolute path to service account json file
-* `config.yaml` - absolute path to YAML config
+* `dactionboard.yaml` - absolute path to YAML config
 
 2. Run:
 
@@ -186,11 +193,23 @@ It will create `dactionboard` docker image you can use later on. It expects the 
 sudo docker run \
     -v /path/to/google-ads.yaml:/google-ads.yaml \
     -v /path/to/service_account.json:/service_account.json \
-    -v /path/to/gaarf_config.yaml:/config.yaml \
+    -v /path/to/dactionboard.yaml:/config.yaml \
     dactionboard
 ```
 
 > Don't forget to change /path/to/google-ads.yaml and /path/to/service_account.json with valid paths.
+
+#### Create dashboard
+*Back to [usage](#usage)*
+
+In order to generate the dashboard run the following command in the terminal:
+
+```
+bash scripts/create_dashboard.sh dactionboard.yaml
+```
+
+This command will open a link in your browser with a copy of the dashboard.
+Alternatively you can follow the documentation on dashboard replication at [how-to-replicate-dashboard](docs/how-to-replicate-dashboard.md) section in docs.
 
 ## Disclaimer
 This is not an officially supported Google product.
