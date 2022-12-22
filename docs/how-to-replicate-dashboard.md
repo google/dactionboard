@@ -12,14 +12,14 @@ Before replicating the dashboard you need to make copies of datasources that pow
 Replication of the datasources is important since they contains multiple calculated metrics which could be problematic to create from scratch.
 
 Make a copy of each of the following 8 datasources used in the template dashboard.
-* [Video Performance](https://datastudio.google.com/c/u/0/datasources/c15b4e79-af56-4eba-b1e7-562ec1c4b9f4)
-* [Ad Video Performance](https://datastudio.google.com/c/u/0/datasources/ec8dcbbf-cb84-461b-a866-47beb286131a)
-* [Geo Performance](https://datastudio.google.com/c/u/0/datasources/eae3304d-bf7a-4a12-9bf7-87d81d5877f6)
-* [Device Performance](https://datastudio.google.com/c/u/0/datasources/7d8a8244-7aad-46cd-8e30-815337a32c32)
-* [Gender Performance](https://datastudio.google.com/c/u/0/datasources/891232ad-0a3e-4c34-ad02-3c2d58f175f7)
-* [Age Performance](https://datastudio.google.com/c/u/0/datasources/9391d85e-7b1a-4b3a-8324-42715f02a0e7)
-* [Video Conversion Split](https://datastudio.google.com/c/u/0/datasources/9391d85e-7b1a-4b3a-8324-42715f02a0e7)
-* [Creative Excellence](https://datastudio.google.com/c/u/0/datasources/5cf90865-eda5-4db3-9deb-31d6ccee7b07)
+* [video_performance](https://datastudio.google.com/c/u/0/datasources/93fafc92-48e4-46cb-937c-748757d209e4)
+* [ad-video_performance](https://datastudio.google.com/c/u/0/datasources/ec8dcbbf-cb84-461b-a866-47beb286131a)
+* [geo_performance](https://datastudio.google.com/c/u/0/datasources/eae3304d-bf7a-4a12-9bf7-87d81d5877f6)
+* [device_performance](https://datastudio.google.com/c/u/0/datasources/7d8a8244-7aad-46cd-8e30-815337a32c32)
+* [gender_performance](https://datastudio.google.com/c/u/0/datasources/891232ad-0a3e-4c34-ad02-3c2d58f175f7)
+* [age_performance](https://datastudio.google.com/c/u/0/datasources/9391d85e-7b1a-4b3a-8324-42715f02a0e7)
+* [video_conversion_split](https://datastudio.google.com/c/u/0/datasources/c15b4e79-af56-4eba-b1e7-562ec1c4b9f4)
+* [creative_excellence](https://datastudio.google.com/c/u/0/datasources/5cf90865-eda5-4db3-9deb-31d6ccee7b07)
 
 In order to replicate a datasource, please do the following:
 * Click on the datasource link above.

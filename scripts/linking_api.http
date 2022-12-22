@@ -2,50 +2,57 @@ https://datastudio.google.com/c/reporting/create?c.mode=edit&c.reportId=ad41d2ca
 r.reportName=dActionBoard_copy&
 ds.*.refreshFields=false&
 ds.excellence.connector=bigQuery&
-ds.excellence.datasourceName=creative_excellence_copy&
+ds.excellence.datasourceName=dactionboard_creative_excellence_copy&
 ds.excellence.projectId=YOUR_PROJECT_ID&
 ds.excellence.type=TABLE&
 ds.excellence.datasetId=YOUR_DATASET_ID&
 ds.excellence.tableId=creative_excellence&
 
 ds.video.connector=bigQuery&
-ds.video.datasourceName=video_performance_copy&
+ds.video.datasourceName=dactionboard_video_performance_copy&
 ds.video.projectId=YOUR_PROJECT_ID&
 ds.video.type=TABLE&
 ds.video.datasetId=YOUR_DATASET_ID&
 ds.video.tableId=video_performance&
 
 ds.vconv.connector=bigQuery&
-ds.vconv.datasourceName=video_conversion_split_copy&
+ds.vconv.datasourceName=dactionboard_video_conversion_split_copy&
 ds.vconv.projectId=YOUR_PROJECT_ID&
 ds.vconv.type=TABLE&
 ds.vconv.datasetId=YOUR_DATASET_ID&
 ds.vconv.tableId=video_conversion_split&
 
 ds.age.connector=bigQuery&
-ds.age.datasourceName=age_performance_copy&
+ds.age.datasourceName=dactionboard_age_performance_copy&
 ds.age.projectId=YOUR_PROJECT_ID&
 ds.age.type=TABLE&
 ds.age.datasetId=YOUR_DATASET_ID&
 ds.age.tableId=age_performance&
 
 ds.gender.connector=bigQuery&
-ds.gender.datasourceName=gender_performance_copy&
+ds.gender.datasourceName=dactionboard_gender_performance_copy&
 ds.gender.projectId=YOUR_PROJECT_ID&
 ds.gender.type=TABLE&
 ds.gender.datasetId=YOUR_DATASET_ID&
 ds.gender.tableId=gender_performance&
 
 ds.device.connector=bigQuery&
-ds.device.datasourceName=device_performance_copy&
+ds.device.datasourceName=dactionboard_device_performance_copy&
 ds.device.projectId=YOUR_PROJECT_ID&
 ds.device.type=TABLE&
 ds.device.datasetId=YOUR_DATASET_ID&
 ds.device.tableId=device_performance&
 
 ds.ad_vid.connector=bigQuery&
-ds.ad_vid.datasourceName=ad_video_performance&
+ds.ad_vid.datasourceName=dactionboard_ad_video_performance&
 ds.ad_vid.projectId=YOUR_PROJECT_ID&
 ds.ad_vid.type=TABLE&
 ds.ad_vid.datasetId=YOUR_DATASET_ID&
-ds.ad_vid.tableId=ad_video_performance
+ds.ad_vid.tableId=ad_video_performance&
+
+ds.geo.connector=bigQuery&
+ds.geo.datasourceName=dactionboard_geo_performance&
+ds.geo.projectId=YOUR_PROJECT_ID&
+ds.geo.type=TABLE&
+ds.geo.datasetId=YOUR_DATASET_ID&
+ds.geo.tableId=geo_performance
