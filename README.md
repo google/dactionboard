@@ -116,13 +116,11 @@ export DACTIONBOARD_BQ_DATASET=
 export DACTIONBOARD_OUTPUT_DATASET=
 export DACTIONBOARD_START_DATE=
 export DACTIONBOARD_END_DATE=
-export DACTIONBOARD_API_VERSION=10
 ```
 
 * `GOOGLE_APPLICATION_CREDENTIALS` - check Service Account Section in [prerequisites](#prerequisites).
 * `DACTIONBOARD_CUSTOMER_ID` should be specified in `1234567890` format (no dashes between digits).
 * `DACTIONBOARD_START_DATE` and `DACTIONBOARD_END_DATE` should be specified in `YYYY-MM-DD` format (i.e. 2022-01-01) or as `:YYYYMMDD-N` macro (where N is a number of days ago, i.e., :YYYYMMDD-7 means 7 days ago).
-* Please note that `DACTIONBOARD_API_VERSION` version is set to 10 in order to ensure the compatibility of queries in the project with this particular API version.
 
 2. Run `gaarf` command to fetch Google Ads data and store them in BigQuery
 
@@ -134,7 +132,6 @@ gaarf google_ads_queries/*/*.sql \
     --bq.dataset=$DACTIONBOARD_BQ_DATASET \
     --macro.start_date=$DACTIONBOARD_START_DATE \
     --macro.end_date=$DACTIONBOARD_END_DATE \
-    --api-version=$DACTIONBOARD_API_VERSION \
     --ads-config=path/to/google-ads.yaml
 ```
 
@@ -213,6 +210,3 @@ Alternatively you can follow the documentation on dashboard replication at [how-
 
 ## Disclaimer
 This is not an officially supported Google product.
-
-Copyright 2022 Google LLC. This solution, including any related sample code or data, is made available on an “as is,” “as available,” and “with all faults” basis, solely for illustrative purposes, and without warranty or representation of any kind. This solution is experimental, unsupported and provided solely for your convenience. Your use of it is subject to your agreements with Google, as applicable, and may constitute a beta feature as defined under those agreements. To the extent that you make any data available to Google in connection with your use of the solution, you represent and warrant that you have all necessary and appropriate rights, consents and permissions to permit Google to use and process that data. By using any portion of this solution, you acknowledge, assume and accept all risks, known and unknown, associated with its usage, including with respect to your deployment of any portion of this solution in your systems, or usage in connection with your business, if at all.
-

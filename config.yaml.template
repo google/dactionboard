@@ -3,8 +3,7 @@ gaarf:
   bq:
     project: YOUR-BQ-PROJECT
     dataset: YOUR-BQ-DATASET
-  # Do not change API version manually
-  api_version: 10
+  api_version: 12
   account: 'MCC-ID'
   customer_ids_query: 'SELECT customer.id FROM ad_group WHERE ad_group.type IN ("VIDEO_RESPONSIVE", "VIDEO_TRUE_VIEW_IN_DISPLAY", "VIDEO_TRUE_VIEW_IN_STREAM") AND campaign.bidding_strategy_type IN ("MAXIMIZE_CONVERSIONS", "TARGET_CPA")'
   params:
