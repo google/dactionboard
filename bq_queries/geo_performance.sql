@@ -15,11 +15,27 @@ CREATE OR REPLACE TABLE {output_dataset}.geo_performance
 AS (
 WITH
     GeoConstants AS (
-      SELECT DISTINCT
+      SELECT
         constant_id,
-        country_code,
-        name
+        ANY_VALUE(country_code) AS country_code,
+        ANY_VALUE(name) AS name
       FROM {bq_dataset}.geo_target_constant
+    GROUP BY 1
+    ),
+    MappingTable AS (
+        SELECT
+            ad_group_id,
+            ANY_VALUE(ad_group_name) AS ad_group_name,
+            ANY_VALUE(ad_group_status) AS ad_group_status,
+            ANY_VALUE(campaign_id) AS campaign_id,
+            ANY_VALUE(campaign_name) AS campaign_name,
+            ANY_VALUE(campaign_status) AS campaign_status,
+            ANY_VALUE(bidding_strategy) AS bidding_strategy,
+            ANY_VALUE(account_id) AS account_id,
+            ANY_VALUE(account_name) AS account_name,
+            ANY_VALUE(currency) AS currency
+        FROM {bq_dataset}.mapping
+        GROUP BY 1
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
@@ -44,8 +60,8 @@ SELECT
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
 FROM {bq_dataset}.geo_performance AS AP
-INNER JOIN {bq_dataset}.mapping AS M
+LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
-INNER JOIN GeoConstants AS GT
+LEFT JOIN GeoConstants AS GT
   ON AP.country_criterion_id = GT.constant_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);

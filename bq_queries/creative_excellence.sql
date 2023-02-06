@@ -49,23 +49,25 @@ WITH
     /* Audience Block */
     AudienceAdGroupTable AS (
         SELECT
-            customer_id,
             campaign_id,
-            custom_audience,
-            user_list,
-            "ad_group" AS level
+            "ad_group" AS level,
+            ANY_VALUE(customer_id) AS customer_id,
+            ANY_VALUE(custom_audience) AS custom_audience,
+            ANY_VALUE(user_list) AS user_list,
         FROM `{bq_dataset}.ad_group_criterion`
         WHERE type = "CUSTOM_AUDIENCE"
+        GROUP BY 1, 2
     ),
     AudienceCampaignTable AS (
         SELECT
-            customer_id,
             campaign_id,
-            custom_audience,
-            user_list,
-            "campaign" AS level
+            "campaign" AS level,
+            ANY_VALUE(customer_id) AS customer_id,
+            ANY_VALUE(custom_audience) AS custom_audience,
+            ANY_VALUE(user_list) AS user_list,
         FROM `{bq_dataset}.campaign_criterion`
         WHERE type = "CUSTOM_AUDIENCE"
+        GROUP BY 1, 2
     ),
     AudienceTable AS (
         SELECT * FROM AudienceAdGroupTable
@@ -122,9 +124,11 @@ WITH
             conversions,
             IF(
                 budget_period = "DAILY", budget_amount,
-                total_budget / (
-                    DATE_DIFF(DATE(end_date), DATE(start_date), DAY))
-                  ) AS daily_budget
+                SAFE_DIVIDE(
+                    total_budget,
+                    (DATE_DIFF(DATE(end_date), DATE(start_date), DAY))
+                )
+              ) AS daily_budget
         FROM `{bq_dataset}.campaign`
     ),
     BidBudgetTable AS (
@@ -275,7 +279,12 @@ WITH
          FROM `{bq_dataset}.campaign` AS C
          LEFT JOIN WebPageConversionTrackingtable AS W
             USING(campaign_id)
-         LEFT JOIN BidBudgetTable AS B
+         LEFT JOIN (
+            SELECT
+            campaign_id,
+            ANY_VALUE(bid_budget_ratio) AS bid_budget_ratio
+            FROM BidBudgetTable
+            GROUP BY 1) AS B
             USING(campaign_id)
          LEFT JOIN SitelinksTable AS S
             USING(campaign_id)
@@ -287,14 +296,15 @@ WITH
             USING(customer_id)
     ),
     MappingTable AS (
-      SELECT DISTINCT
-        account_id,
-        account_name,
+      SELECT
         campaign_id,
-        campaign_name,
-        campaign_status,
-        bidding_strategy,
+        ANY_VALUE(campaign_name) AS campaign_name,
+        ANY_VALUE(campaign_status) AS campaign_status,
+        ANY_VALUE(bidding_strategy) AS bidding_strategy,
+        ANY_VALUE(account_id) AS account_id,
+        ANY_VALUE(account_name) AS account_name
       FROM {bq_dataset}.mapping
+    GROUP BY 1
     )
 SELECT
     M.account_id,

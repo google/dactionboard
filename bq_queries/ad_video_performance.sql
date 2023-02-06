@@ -58,26 +58,58 @@ WITH
         FROM {bq_dataset}.targeting_topics
         GROUP BY 1
     ),
+    MappingTable AS (
+        SELECT
+            ad_group_id,
+            ANY_VALUE(ad_group_name) AS ad_group_name,
+            ANY_VALUE(ad_group_status) AS ad_group_status,
+            ANY_VALUE(campaign_id) AS campaign_id,
+            ANY_VALUE(campaign_name) AS campaign_name,
+            ANY_VALUE(campaign_status) AS campaign_status,
+            ANY_VALUE(bidding_strategy) AS bidding_strategy,
+            ANY_VALUE(account_id) AS account_id,
+            ANY_VALUE(account_name) AS account_name,
+            ANY_VALUE(currency) AS currency
+        FROM {bq_dataset}.mapping
+        GROUP BY 1
+    ),
+    AdGroupTargetingTable AS (
+        SELECT
+            M.ad_group_id,
+            M.campaign_id,
+            ad_group_audiences,
+            topics
+        FROM MappingTable AS M
+        LEFT JOIN AdGroupAudiencesTable AS AA
+            ON M.ad_group_id = AA.ad_group_id
+        LEFT JOIN TopicsTable AS T
+            ON M.ad_group_id = T.ad_group_id
+    ),
     TargetingTable AS (
         SELECT
             M.campaign_id,
             M.ad_group_id,
-            devices,
-            locations,
-            campaign_audiences,
-            ad_group_audiences,
-            topics
-        FROM {bq_dataset}.mapping AS M
+            D.devices,
+            L.locations,
+            CA.campaign_audiences,
+            M.ad_group_audiences,
+            M.topics
+        FROM AdGroupTargetingTable AS M
         LEFT JOIN DevicesTable AS D
             ON M.campaign_id = D.campaign_id
         LEFT JOIN LocationsTable AS L
             ON M.campaign_id = L.campaign_id
         LEFT JOIN CampaignAudiencesTable AS CA
             ON M.campaign_id = CA.campaign_id
-        LEFT JOIN AdGroupAudiencesTable AS AA
-            ON M.ad_group_id = AA.ad_group_id
-        LEFT JOIN TopicsTable AS T
-            ON M.ad_group_id = T.ad_group_id
+    ),
+    AdMatchingTable AS(
+        SELECT
+            ad_id,
+            ANY_VALUE(youtube_video_id) AS youtube_video_id,
+            ANY_VALUE(youtube_title) AS youtube_title,
+            ANY_VALUE(youtube_video_duration) AS youtube_video_duration
+        FROM {bq_dataset}.ad_matching
+        GROUP BY 1
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
@@ -118,17 +150,16 @@ SELECT
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
 FROM {bq_dataset}.ad_performance AS AP
-INNER JOIN {bq_dataset}.ad_matching AS AM
+INNER JOIN AdMatchingTable AS AM
   ON AP.ad_id = AM.ad_id
 LEFT JOIN {bq_dataset}.video_headlines_call_to_actions AS V
   ON AP.ad_id = V.ad_id
-LEFT JOIN {bq_dataset}.mapping AS M
+LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN {bq_dataset}.asset_mapping AS Assets
   ON V.in_stream_companion_banner = CAST(Assets.asset_id AS STRING)
 LEFT JOIN {bq_dataset}.asset_mapping AS Assets2
   ON V.responsive_companion_banner = CAST(Assets2.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
-    ON M.campaign_id = TT.campaign_id
-        AND M.ad_group_id = TT.ad_group_id
+    ON M.ad_group_id = TT.ad_group_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
