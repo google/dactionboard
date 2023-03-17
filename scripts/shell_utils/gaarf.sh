@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022 Google LLC
+# Copyright 2023 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-google_ads_config=$1
-config_file=$2
-loglevel=$3
-gaarf google_ads_queries/*/*.sql \
-  -c=${config_file:-config.yaml} \
-	--ads-config=${google_ads_config:-google-ads.yaml} \
-	--loglevel=${loglevel:-"INFO"}
-gaarf-bq bq_queries/*.sql \
-	-c=${config_file:-config.yaml} \
-	--loglevel=${loglevel:-"INFO"}
+fetch_reports() {
+  gaarf $(dirname $0)/google_ads_queries/*/*.sql \
+  --account=$customer_id \
+  --output=bq \
+  --customer-ids-query="$customer_ids_query" \
+  --bq.project=$project --bq.dataset=$bq_dataset \
+  --macro.start_date=$start_date --macro.end_date=$end_date \
+  --ads-config=$ads_config "$@"
+}
+
+generate_output_tables() {
+  gaarf-bq $(dirname $0)/bq_queries/*.sql \
+    --project=$project --target=$bq_dataset_output $macros "$@"
+}
