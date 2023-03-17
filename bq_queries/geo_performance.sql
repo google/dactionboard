@@ -19,7 +19,7 @@ WITH
         constant_id,
         ANY_VALUE(country_code) AS country_code,
         ANY_VALUE(name) AS name
-      FROM {bq_dataset}.geo_target_constant
+      FROM `{bq_dataset}.geo_target_constant`
     GROUP BY 1
     ),
     MappingTable AS (
@@ -34,7 +34,7 @@ WITH
             ANY_VALUE(account_id) AS account_id,
             ANY_VALUE(account_name) AS account_name,
             ANY_VALUE(currency) AS currency
-        FROM {bq_dataset}.mapping
+        FROM `{bq_dataset}.mapping`
         GROUP BY 1
     )
 SELECT
@@ -59,7 +59,7 @@ SELECT
     SUM(AP.view_through_conversions) AS view_through_conversions,
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
-FROM {bq_dataset}.geo_performance AS AP
+FROM `{bq_dataset}.geo_performance` AS AP
 LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN GeoConstants AS GT

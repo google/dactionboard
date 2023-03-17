@@ -19,20 +19,20 @@ WITH
             constant_id,
             country_code,
             name
-        FROM {bq_dataset}.geo_target_constant
+        FROM `{bq_dataset}.geo_target_constant`
     ),
     DevicesTable AS (
         SELECT
             campaign_id,
             ARRAY_AGG(DISTINCT device_type ORDER BY device_type) AS devices
-        FROM {bq_dataset}.targeting_devices
+        FROM `{bq_dataset}.targeting_devices`
         GROUP BY 1
     ),
     LocationsTable AS (
         SELECT
             campaign_id,
             ARRAY_AGG(DISTINCT GT.name ORDER BY GT.name) AS locations,
-        FROM {bq_dataset}.targeting_country AS C
+        FROM `{bq_dataset}.targeting_country` AS C
         INNER JOIN GeoConstants AS GT
             ON CAST( SPLIT(C.location, "/")[SAFE_OFFSET(1)] AS INT64) = GT.constant_id
         GROUP BY 1
@@ -41,21 +41,21 @@ WITH
         SELECT
             campaign_id,
             ARRAY_AGG(DISTINCT IFNULL(display_name, "")) AS campaign_audiences
-        FROM {bq_dataset}.targeting_audiences_campaign
+        FROM `{bq_dataset}.targeting_audiences_campaign`
         GROUP BY 1
     ),
     AdGroupAudiencesTable AS (
         SELECT
             ad_group_id,
             ARRAY_AGG(DISTINCT IFNULL(display_name, "")) AS ad_group_audiences
-        FROM {bq_dataset}.targeting_audiences_adgroup
+        FROM `{bq_dataset}.targeting_audiences_adgroup`
         GROUP BY 1
     ),
     TopicsTable AS (
         SELECT
             ad_group_id,
             ARRAY_AGG(DISTINCT IFNULL(topic, "")) AS topics
-        FROM {bq_dataset}.targeting_topics
+        FROM `{bq_dataset}.targeting_topics`
         GROUP BY 1
     ),
     MappingTable AS (
@@ -70,7 +70,7 @@ WITH
             ANY_VALUE(account_id) AS account_id,
             ANY_VALUE(account_name) AS account_name,
             ANY_VALUE(currency) AS currency
-        FROM {bq_dataset}.mapping
+        FROM `{bq_dataset}.mapping`
         GROUP BY 1
     ),
     AdGroupTargetingTable AS (
@@ -108,7 +108,7 @@ WITH
             ANY_VALUE(youtube_video_id) AS youtube_video_id,
             ANY_VALUE(youtube_title) AS youtube_title,
             ANY_VALUE(youtube_video_duration) AS youtube_video_duration
-        FROM {bq_dataset}.ad_matching
+        FROM `{bq_dataset}.ad_matching`
         GROUP BY 1
     )
 SELECT
@@ -149,16 +149,16 @@ SELECT
     SUM(AP.view_through_conversions) AS view_through_conversions,
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
-FROM {bq_dataset}.ad_performance AS AP
+FROM `{bq_dataset}.ad_performance` AS AP
 INNER JOIN AdMatchingTable AS AM
   ON AP.ad_id = AM.ad_id
-LEFT JOIN {bq_dataset}.video_headlines_call_to_actions AS V
+LEFT JOIN `{bq_dataset}.video_headlines_call_to_actions` AS V
   ON AP.ad_id = V.ad_id
 LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
-LEFT JOIN {bq_dataset}.asset_mapping AS Assets
+LEFT JOIN `{bq_dataset}.asset_mapping` AS Assets
   ON V.in_stream_companion_banner = CAST(Assets.asset_id AS STRING)
-LEFT JOIN {bq_dataset}.asset_mapping AS Assets2
+LEFT JOIN `{bq_dataset}.asset_mapping` AS Assets2
   ON V.responsive_companion_banner = CAST(Assets2.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
     ON M.ad_group_id = TT.ad_group_id

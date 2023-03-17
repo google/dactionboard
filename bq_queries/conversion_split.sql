@@ -29,7 +29,7 @@ SELECT
     SUM(AP.all_conversions) AS all_conversions,
     SUM(AP.conversions) AS conversions,
     SUM(AP.view_through_conversions) AS view_through_conversions
-FROM {bq_dataset}.conversion_split AS AP
-INNER JOIN {bq_dataset}.mapping AS M
+FROM `{bq_dataset}.conversion_split` AS AP
+INNER JOIN `{bq_dataset}.mapping` AS M
   ON AP.ad_group_id = M.ad_group_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);

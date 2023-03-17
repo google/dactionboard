@@ -33,7 +33,7 @@ SELECT
     SUM(AP.view_through_conversions) AS view_through_conversions,
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
-FROM {bq_dataset}.ad_performance AS AP
-INNER JOIN {bq_dataset}.mapping AS M
+FROM `{bq_dataset}.ad_performance` AS AP
+INNER JOIN `{bq_dataset}.mapping` AS M
   ON AP.ad_group_id = M.ad_group_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);

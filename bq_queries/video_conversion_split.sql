@@ -19,7 +19,7 @@ WITH PerformanceTable AS (
         ad_group_id,
         ad_id,
         SUM(cost) AS cost
-    FROM {bq_dataset}.ad_performance
+    FROM `{bq_dataset}.ad_performance`
     GROUP BY 1, 2, 3
 )
 SELECT
@@ -44,10 +44,10 @@ SELECT
     SUM(IFNULL(AP.conversions, 0)) AS conversions,
     SUM(IFNULL(AP.view_through_conversions, 0)) AS view_through_conversions
 FROM PerformanceTable AS P
-LEFT JOIN {bq_dataset}.conversion_split AS AP
+LEFT JOIN `{bq_dataset}.conversion_split` AS AP
     USING(ad_group_id, date, ad_id)
-INNER JOIN {bq_dataset}.mapping AS M
+INNER JOIN `{bq_dataset}.mapping` AS M
   ON AP.ad_group_id = M.ad_group_id
-INNER JOIN {bq_dataset}.ad_matching AS AM
+INNER JOIN `{bq_dataset}.ad_matching` AS AM
   ON AP.ad_id = AM.ad_id
 GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16);
