@@ -1,0 +1,14 @@
+{
+  "report_id": "ad41d2ca-1d20-43a2-97b8-6cfa141e0f7a",
+  "dashboard_name": "dactionboard_copy",
+  "dashboard_datasources": {
+    "vconv": "video_conversion_split",
+    "video": "video_performance",
+    "age": "age_performance",
+    "geo": "geo_performance",
+    "gender": "gender_performance",
+    "device": "device_performance",
+    "excellence": "creative_excellence",
+    "ad_vid": "ad_video_performance"
+  }
+}

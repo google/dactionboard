@@ -43,6 +43,7 @@ List of tables:
         ```
         export GOOGLE_APPLICATION_CREDENTIALS=path/to/service_account.json
         ```
+* Membership in [dactionboard-readers-external](https://groups.google.com/g/dactionboard) group to get access to the template dashboard and datasources. You can apply [here](https://groups.google.com/g/dactionboard).
 
 ### Installation
 In order to run dActionBoard please follow the steps outlined below:
@@ -65,10 +66,7 @@ In order to run dActionBoard please follow the steps outlined below:
 
 1. [Generate tables](#generate-tables)
     1. [Option 1: Initial setup and run via an interactive installer](#initial-setup-and-run-via-an-interactive-installer)
-    2. [Option 2: Running queries locally](#running-queries-locally)
-        * [With individual parameters](#run-with-individual-parameters)
-        * [With config](#run-with-config)
-    3. [Option 3: Running queries in a Docker container](#run-queries-in-a-docker-container)
+    2. [Option 3: Running queries in a Docker container](#run-queries-in-a-docker-container)
 2. [Create dashboard](#create-dashboard)
 
 
@@ -130,10 +128,11 @@ sudo docker run  \
 #### Create dashboard
 *Back to [usage](#usage)*
 
-In order to generate the dashboard run the following command in the terminal:
+In order to generate the dashboard install [Looker Studio Dashboard Cloner](https://github.com/google/looker-studio-dashboard-cloner)
+and run the following command in the terminal:
 
 ```
-bash scripts/create_dashboard.sh dactionboard.yaml
+lsd-cloner --answers=dashboard_answers.json
 ```
 
 This command will open a link in your browser with a copy of the dashboard.

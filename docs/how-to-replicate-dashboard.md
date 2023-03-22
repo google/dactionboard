@@ -1,12 +1,43 @@
 # Creating dActionBoard in DataStudio
 
 Once data for dActionBoard data are generated and stored in BigQuery you can
-proceed with replication which consists of two steps:
+proceed with replication.
+
+## Creating dashboard with Looker Studio Dashboard Cloner
+
+Install [Looker Studio Dashboard Cloner](https://github.com/google/looker-studio-dashboard-cloner),
+go the [`dactionboard`](../) folder and run the following command in the terminal:
+
+```
+lsd-cloner --answers=dashboard_answers.json
+```
+
+You will be presented with a series of questions (regarding BigQuery project and dataset)
+and after that the tool will open a link in your browser with a copy of the dashboard.
+> Comment report_id in `answers.json` to supply custom report_id to the tool.
+
+## Creating the dashboard from config
+
+If for some reason you cannot install Looker Studio Dashboard Cloner you can always
+replicate the dashboard by running `create_dashboard.sh` script:
+
+1. Go to [`dactionboard`](../) folder
+
+2. Run `bash scripts/create_dashboard.sh dactionboard.yaml -c dactionboard.yaml`
+command in the terminal, there `dactionboard.yaml` is the name config for dactionboard.\
+You can provide optional arguments to the script:
+* `--report-name="<YOUR_NAME_FOR_THE_DASHBOARD>"` - where YOUR_NAME_FOR_THE_DASHBOARD is the name of the generated dashboard.
+* `--report-id=<ID_OF_REPORT>` - custom dashboard id (useful when you made some customization to the dashboard and want to clone it)
+* `--project=<YOUR_BQ_PROJECT_NAME>` - name of BigQuery project which contains dActionBoard data
+* `--dataset=<YOUR_BQ_DATASET_NAME>` - name of BigQuery dataset which contains dActionBoard data
+
+## Manual creation
+
+The process of manual replication consists of two steps:
 
 * Replication of datasources
 * Replication of dashboard
 
-## Replicate datasources
 
 Before replicating the dashboard you need to make copies of datasources that power up the dashboard.
 Replication of the datasources is important since they contains multiple calculated metrics which could be problematic to create from scratch.

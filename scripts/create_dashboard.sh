@@ -1,4 +1,5 @@
-# Copyright 2022 Google LLC
+#!/bin/bash
+## Copyright 2022 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,10 +13,50 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-config=$1
-project_id=`grep -A1 "gaarf-bq" $config | tail -n1 | cut -d ":" -f 2 | tr -d " "`
-dataset_id=`grep output_dataset $config | tail -n1 | cut -d ":" -f 2 | tr -d " "`
+report_id=187f1f41-16bc-434d-8437-7988bed6e8b9
+report_name="dactionboard_copy"
+return_link=0
 
-link=`cat $(dirname $0)/linking_api.http | sed "s/YOUR_PROJECT_ID/$project_id/g; s/YOUR_DATASET_ID/$dataset_id/g" | sed '/^$/d;' | tr -d '\n'`
-echo
-open $link || (echo "Please visit the link below to generate the dashboard: " && echo $link)
+while :; do
+case $1 in
+	-c|--config)
+		shift
+		config=$1
+		project_id=`grep -A1 "gaarf-bq" $config | tail -n1 | cut -d ":" -f 2 | tr -d " "`
+		dataset_id=`grep output_dataset $config | tail -n1 | cut -d ":" -f 2 | tr -d " "`
+		;;
+	-p|--project)
+		shift
+		project_id=$1
+		;;
+	-d|--dataset)
+		shift
+		dataset_id=$1
+		;;
+  -L|--link)
+    return_link=1
+    ;;
+	-n|--report-name)
+		shift
+		report_name=`echo "$1" | tr  " " "_"`
+		;;
+	--report-id)
+		shift
+		report_id=$1
+		;;
+	-h|--help)
+		echo -e $usage;
+		exit
+		;;
+	*)
+		break
+	esac
+	shift
+done
+
+link=`cat $(dirname $0)/linking_api.http | sed "s/REPORT_ID/$report_id/; s/REPORT_NAME/$report_name/; s/YOUR_PROJECT_ID/$project_id/g; s/YOUR_DATASET_ID/$dataset_id/g" | sed '/^$/d;' | tr -d '\n'`
+if [ $return_link -eq 1 ]; then
+  echo "$link"
+else
+  open "$link"
+fi
