@@ -1,6 +1,4 @@
-FROM python:3.10-slim-buster
-ADD requirements.txt .
-RUN pip install --require-hashes -r requirements.txt
+FROM ghcr.io/google/gaarf-py
 ADD google_ads_queries/ google_ads_queries/
 ADD bq_queries/ bq_queries/
 ADD scripts/run-docker.sh .
