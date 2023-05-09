@@ -1,7 +1,9 @@
 FROM ghcr.io/google/gaarf-py
 ADD google_ads_queries/ google_ads_queries/
 ADD bq_queries/ bq_queries/
-ADD scripts/run-docker.sh .
-RUN chmod a+x run-docker.sh
+COPY scripts/ scripts/
+COPY run-local.sh .
+RUN chmod a+x run-local.sh
 ENV GOOGLE_APPLICATION_CREDENTIALS service_account.json
-ENTRYPOINT ["./run-docker.sh"]
+ENTRYPOINT ["./run-local.sh", "--quiet"]
+CMD ["--google-ads-config", "/google-ads.yaml", "--config", "/dactionboard.yaml"]

@@ -101,7 +101,7 @@ You can run dActionBoard queries inside a Docker container.
 
 ```
 sudo docker run \
-   -v /path/to/google-ads.yaml.json:/google-ads.yaml \
+   -v /path/to/google-ads.yaml:/google-ads.yaml \
    -v /path/to/dactionboard.yaml:/config.yaml \
    -v /path/to/service_account.json:/service_account.json \
    ghcr.io/google/dactionboard

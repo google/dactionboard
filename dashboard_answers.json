@@ -1,5 +1,5 @@
 {
-  "report_id": "ad41d2ca-1d20-43a2-97b8-6cfa141e0f7a",
+  "dashboard_id": "ad41d2ca-1d20-43a2-97b8-6cfa141e0f7a",
   "dashboard_name": "dactionboard_copy",
   "dashboard_datasources": {
     "vconv": "video_conversion_split",
