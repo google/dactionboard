@@ -23,7 +23,7 @@ replicate the dashboard by running `create_dashboard.sh` script:
 
 1. Go to [`dactionboard`](../) folder
 
-2. Run `bash scripts/create_dashboard.sh dactionboard.yaml -c dactionboard.yaml`
+2. Run `bash scripts/create_dashboard.sh -c dactionboard.yaml`
 command in the terminal, there `dactionboard.yaml` is the name config for dactionboard.\
 You can provide optional arguments to the script:
 * `--report-name="<YOUR_NAME_FOR_THE_DASHBOARD>"` - where YOUR_NAME_FOR_THE_DASHBOARD is the name of the generated dashboard.
