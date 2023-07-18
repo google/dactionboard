@@ -50,7 +50,10 @@ case $1 in
     ;;
   -g|--google-ads-config)
     shift
-    google_ads_config=$1
+    ads_config=$1
+    ;;
+  --generate-config-only)
+    generate_config_only="y"
     ;;
   -h|--help)
     echo -e $usage;
@@ -65,10 +68,13 @@ done
 # Specify customer ids query that fetch data only from accounts that have at least one app campaign in them.
 customer_ids_query='SELECT customer.id FROM ad_group WHERE ad_group.type IN ("VIDEO_RESPONSIVE", "VIDEO_TRUE_VIEW_IN_DISPLAY", "VIDEO_TRUE_VIEW_IN_STREAM") AND campaign.bidding_strategy_type IN ("MAXIMIZE_CONVERSIONS", "TARGET_CPA")'
 
-API_VERSION=12
+API_VERSION=13
 
 welcome() {
   echo -e "${COLOR}Welcome to installation of $solution_name${NC} "
+  echo
+  echo "Please answer a couple of questions. The default answers are specified in parentheses, press Enter to select them"
+  echo
 }
 
 generate_bq_macros() {
@@ -77,29 +83,55 @@ generate_bq_macros() {
 }
 
 setup() {
-  echo -n "Enter account_id in XXXXXXXXXX format: "
+  # get default value from google-ads.yaml
+  if [[ -n $ads_config ]]; then
+    parse_yaml $ads_config "GOOGLE_ADS_"
+    local login_customer_id=$GOOGLE_ADS_login_customer_id
+  fi
+  echo -n "Enter account_id in XXXXXXXXXX format ($login_customer_id): "
   read -r customer_id
-  echo -n "Enter BigQuery project_id: "
+  customer_id=${customer_id:-$login_customer_id}
+
+  default_project=${GOOGLE_CLOUD_PROJECT:-$(gcloud config get-value project 2>/dev/null)}
+  echo -n "Enter BigQuery project_id ($default_project): "
   read -r project
-  echo -n "Enter BigQuery dataset: "
+  project=${project:-$default_project}
+
+  echo -n "Enter BigQuery dataset (dactionboard): "
   read -r bq_dataset
-  echo -n "Enter start_date in YYYY-MM-DD format (or use :YYYYMMDD-90 for last 90 days): "
-  read -r start_date
-  echo -n "Enter end_date in YYYY-MM-DD format (or use :YYYYMMDD-1 for yesterday): "
-  read -r end_date
-  start_date=${start_date:-:YYYYMMDD-90}
-  end_date=${end_date:-:YYYYMMDD-1}
+  bq_dataset=${bq_dataset:-dactionboard}
+  get_start_end_date
+
   generate_bq_macros
-  echo -n "Do you want to save this config (Y/n): "
-  read -r save_config_answer
-  save_config_answer=$(convert_answer $save_config_answer)
-  if [[ $save_config_answer = "y" ]]; then
+
+  if [[ -n $RUNNING_IN_GCE && $generate_config_only ]]; then
+    # if you're running inside Google Cloud Compute Engine as generating config
+    # (see gcp/cloud-run-button/main.sh) then there's no need for additional questions
     save_config="--save-config --config-destination=$solution_name_lowercase.yaml"
     echo -e "${COLOR}Saving configuration to $solution_name_lowercase.yaml${NC}"
     fetch_reports $save_config --log=$loglevel --api-version=$API_VERSION --dry-run
     generate_output_tables $save_config --log=$loglevel --dry-run
+    exit
+  fi
+
+  echo -n "Do you want to save this config (Y/n): "
+  read -r save_config_answer
+  save_config_answer=$(convert_answer $save_config_answer 'Y')
+  if [[ $save_config_answer = "y" ]]; then
+    echo -n "Save config as ($solution_name_lowercase.yaml): "
+    read -r config_file_name
+    config_file_name=${config_file_name:-$solution_name_lowercase.yaml}
+    config_file=$(echo "`echo $config_file_name | sed 's/\.yaml//'`.yaml")
+    save_config="--save-config --config-destination=$config_file"
+    echo -e "${COLOR}Saving configuration to $config_file${NC}"
+    fetch_reports $save_config --log=$loglevel --api-version=$API_VERSION --dry-run
+    generate_output_tables $save_config --log=$loglevel --dry-run
+
+    if [[ $generate_config_only = "y" ]]; then
+      exit
+    fi
   elif [[ $save_config_answer = "q" ]]; then
-    exit 1
+    exit
   fi
   print_configuration
 }
@@ -139,27 +171,24 @@ if [[ -z ${loglevel} ]]; then
   loglevel="INFO"
 fi
 
-if [[ -n "$config_file" ]]; then
-  if [[ $quiet = "n" ]]; then
+if [[ -n "$config_file" || -f $solution_name_lowercase.yaml ]]; then
+  config_file=${config_file:-$solution_name_lowercase.yaml}
+  if [[ $quiet = "y" ]]; then
+    run_with_config
+  else
     echo -e "${COLOR}Found saved configuration at $config_file${NC}"
+    echo -e "${COLOR}If you want to provide alternative configuration use '-c path/to/config.yaml' and restart.${NC}"
     if [[ -f "$config_file" ]]; then
       cat $config_file
     fi
-    echo -n -e "${COLOR}Do you want to use it (Y/n/q): ${NC}"
+    echo -n -e "${COLOR}Do you want to use this configuration? (Y/n) or press Q to quit: ${NC}"
     read -r setup_config_answer
-    setup_config_answer=$(convert_answer $setup_config_answer)
+    setup_config_answer=$(convert_answer $setup_config_answer 'Y')
     if [[ $setup_config_answer = "y" ]]; then
       echo -e "${COLOR}Using saved configuration...${NC}"
       run_with_config
     elif [[ $setup_config_answer = "n" ]]; then
-      echo -n -e "${COLOR}Choose [N]ew configuration or [S]tart over: (N/S): ${NC}"
-      read -r new_config_start_over
-      new_config_start_over=$(convert_answer $new_config_start_over)
-      if [[ $new_config_start_over = "n" ]]; then
-        echo -n -e "${COLOR}Provide full path to saved configuration: ${NC}"
-        read -r config_file
-        run_with_config
-      elif [[ $new_config_start_over = "s" ]]; then
+      echo -e "${COLOR}Setting up new configuration... (Press Ctrl + C to exit)${NC}"
         setup
         prompt_running
         run_with_parameters
@@ -167,20 +196,5 @@ if [[ -n "$config_file" ]]; then
         echo "Unknown command, exiting"
         exit
       fi
-    elif [[ $setup_config_answer = "q" ]]; then
-      exit 1
-    else
-      echo
-      welcome
-      setup
-      prompt_running
-    fi
-  else
-    run_with_config
   fi
-else
-  welcome
-  setup
-  prompt_running
-  run_with_parameters
 fi
