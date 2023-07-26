@@ -1,0 +1,40 @@
+{
+  "use_current_project": true,
+  "name": "dactionboard",
+  "gcs_bucket": "",
+  "path_to_ads_queries": "google_ads_queries",
+  "path_to_bq_queries": "bq_queries",
+  "custom_ids_query_path": "get-accounts.sql",
+  "use_googleads_config": true,
+  "path_to_googleads_config": "google-ads.yaml",
+  "cf_memory": "2048MB",
+  "deploy_scripts": true,
+  "deploy_wf": true,
+  "output_dataset": "dactionboard",
+  "ads_macro": {
+    "start_date": ":YYYYMMDD-90",
+    "end_date": ":YYYYMMDD-1"
+  },
+  "bq_macro": {
+    "bq_dataset": "dactionboard",
+    "output_dataset": "dactionboard_output"
+  },
+  "schedule_wf": true,
+  "schedule_time": "04:00",
+  "run_job": false,
+  "run_wf": true,
+  "clone_dashboard": true,
+  "dashboard_id": "ad41d2ca-1d20-43a2-97b8-6cfa141e0f7a",
+  "dashboard_name": "dActionBoard copy",
+  "dashboard_dataset": "dactionboard",
+  "dashboard_datasources": {
+    "vconv": "video_conversion_split",
+    "video": "video_performance",
+    "age": "age_performance",
+    "geo": "geo_performance",
+    "gender": "gender_performance",
+    "device": "device_performance",
+    "excellence": "creative_excellence",
+    "ad_vid": "ad_video_performance"
+  }
+}

@@ -7,6 +7,7 @@
 1. [Installation](#installation)
     * [Primary Installation Method](#primary-installation-method)
     * [Manual installation in Google Cloud](#manual-installation-in-google-cloud)
+    * [Gaarf Workflow Installation in Google Cloud](#gaarf-workflow-installation-in-google-cloud)
     * [Alternative Installation Methods](#alternative-installation-methods)
         * [Prerequisites for alternative installation methods](#prerequisites-for-alternative-installation-methods)
         * [Running Queries Locally](#running-queries-locally)
@@ -158,6 +159,17 @@ ERROR: (gcloud.artifacts.repositories.create) INVALID_ARGUMENT: Maven config is 
 ```
 Please update your Cloud SDK CLI by running `gcloud components update`
 
+
+### Gaarf Workflow Installation in Google Cloud
+*Back to [table of content](#table-of-content)*
+
+You can use [Gaarf Workflows](https://github.com/google/ads-api-report-fetcher/tree/main/gcp) to deploy dactionBoard.
+
+1. Clone this repository and go to dactionboard folder `cd dactionboard`
+2. Start the interactive generation `npm init gaarf-wf@latest -- --answers=answers.json`
+> You need Node.js and npm installed to complete the previous step.
+3. Follow steps outlined in the interactive tool.
+4. Once the installation is completed you'll get a link for replicating the dashboard.
 
 ### Alternative Installation Methods
 *Back to [table of content](#table-of-content)*
