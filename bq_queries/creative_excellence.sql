@@ -129,7 +129,7 @@ WITH
                     (DATE_DIFF(DATE(end_date), DATE(start_date), DAY))
                 )
               ) AS daily_budget
-        FROM `{bq_dataset}.campaign`
+        FROM `{bq_dataset}.campaign_settings`
     ),
     BidBudgetTable AS (
         SELECT
@@ -172,7 +172,7 @@ WITH
         SELECT
             campaign_id,
             COUNT(DISTINCT AllConversions.conversion_id) AS n_conversions
-        FROM `{bq_dataset}.campaign`,
+        FROM `{bq_dataset}.campaign_settings`,
         UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
         LEFT JOIN `{bq_dataset}.conversion_action` AS AllConversions
             ON conversion_id = CAST(AllConversions.conversion_id AS STRING)
@@ -194,7 +194,7 @@ WITH
         SELECT
             campaign_id,
             COUNT(DISTINCT WebPageConversions.conversion_id) AS n_webpage_conversions
-        FROM `{bq_dataset}.campaign`,
+        FROM `{bq_dataset}.campaign_settings`,
         UNNEST(SPLIT(selective_optimization_conversion_actions, "|")) AS conversion_id
         LEFT JOIN `{bq_dataset}.conversion_action` AS WebPageConversions
             ON conversion_id = CAST(WebPageConversions.conversion_id AS STRING)
@@ -241,7 +241,7 @@ WITH
                 TRUE,
                 IFNULL(is_account_webpage_tracking, FALSE)
                     AND CN.campaign_id IS NULL) AS is_webpage_tracking
-        FROM `{bq_dataset}.campaign` AS C
+        FROM `{bq_dataset}.campaign_settings` AS C
         LEFT JOIN CampaignAllConversionTrackingTable AS CN
             USING(campaign_id)
         LEFT JOIN CampaignWebPageConversionTrackingTable AS CW
@@ -276,7 +276,7 @@ WITH
         TRUE, FALSE
           ) AS is_creative_optimized,
           cost
-         FROM `{bq_dataset}.campaign` AS C
+         FROM `{bq_dataset}.campaign_settings` AS C
          LEFT JOIN WebPageConversionTrackingtable AS W
             USING(campaign_id)
          LEFT JOIN (
