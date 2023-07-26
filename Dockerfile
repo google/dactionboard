@@ -1,8 +1,5 @@
-FROM python:3.10-slim-buster
-
+FROM ghcr.io/google/gaarf-py
 WORKDIR /app
-COPY requirements.txt requirements.txt
-RUN pip install --require-hashes -r requirements.txt --no-deps
 ADD google_ads_queries/ google_ads_queries/
 ADD bq_queries/ bq_queries/
 COPY scripts/ scripts/
