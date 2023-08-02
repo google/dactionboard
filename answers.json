@@ -19,6 +19,9 @@
     "bq_dataset": "dactionboard",
     "output_dataset": "dactionboard_output"
   },
+  "bq_writer_options": {
+    "array_handling": "strings"
+  },
   "schedule_wf": true,
   "schedule_time": "04:00",
   "run_job": false,
