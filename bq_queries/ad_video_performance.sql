@@ -110,6 +110,18 @@ WITH
             ANY_VALUE(youtube_video_duration) AS youtube_video_duration
         FROM `{bq_dataset}.ad_matching`
         GROUP BY 1
+    ),
+    CustomConvSplit AS (
+        SELECT
+            date,
+            ad_id,
+            {% for custom_conversion in custom_conversions %}
+                {% for conversion_alias, conversion_name in custom_conversion.items() %}
+                    SUM(IF(conversion_name IN ('{{conversion_name}}'), all_conversions, 0)) AS conversions_{{conversion_alias}},
+                {% endfor %}
+            {% endfor %}
+        FROM `{bq_dataset}.conversion_split` AS AP
+        GROUP BY 1,2
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
@@ -145,6 +157,11 @@ SELECT
     SUM(AP.impressions) AS impressions,
     SUM(AP.all_conversions) AS all_conversions,
     SUM(AP.conversions) AS conversions,
+    {% for custom_conversion in custom_conversions %}
+        {% for conversion_alias, conversion_name in custom_conversion.items() %}
+            SUM(COALESCE(CCS.conversions_{{conversion_alias}}, 0)) AS conversions_{{conversion_alias}},
+        {% endfor %}
+    {% endfor %}
     SUM(AP.video_views) AS video_views,
     SUM(AP.view_through_conversions) AS view_through_conversions,
     SUM(AP.engagements) AS engagements,
@@ -154,6 +171,9 @@ INNER JOIN AdMatchingTable AS AM
   ON AP.ad_id = AM.ad_id
 LEFT JOIN `{bq_dataset}.video_headlines_call_to_actions` AS V
   ON AP.ad_id = V.ad_id
+LEFT JOIN CustomConvSplit AS CCS
+  ON AP.ad_id = CCS.ad_id
+    AND AP.date = CCS.date
 LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN `{bq_dataset}.asset_mapping` AS Assets
