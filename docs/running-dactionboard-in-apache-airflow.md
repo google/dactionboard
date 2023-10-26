@@ -40,7 +40,7 @@ with DAG('dactionboard', default_args=default_args, schedule_interval="* 0 * * *
         mounts=[
             Mount(
                 source="/path/to/service_account.json",
-                target="/service_account.json",
+                target="/app/service_account.json",
                 type="bind"),
             Mount(
                 source="/path/to/google-ads.yaml",

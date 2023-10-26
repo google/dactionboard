@@ -1,10 +1,8 @@
-FROM ghcr.io/google/gaarf-py
-WORKDIR /app
-ADD google_ads_queries/ google_ads_queries/
-ADD bq_queries/ bq_queries/
-COPY scripts/ scripts/
-COPY run-local.sh .
-RUN chmod a+x run-local.sh
-ENV GOOGLE_APPLICATION_CREDENTIALS service_account.json
-ENTRYPOINT ["./run-local.sh", "--quiet"]
+FROM python:3.10-slim-buster
+COPY app/requirements.txt requirements.txt
+RUN --mount=type=cache,target=/root/.cache pip install --require-hashes -r requirements.txt --no-deps
+COPY app app
+ENV GOOGLE_APPLICATION_CREDENTIALS app/service_account.json
+
+ENTRYPOINT ["./app/run-local.sh", "--quiet"]
 CMD ["--google-ads-config", "/google-ads.yaml", "--config", "/dactionboard.yaml"]
