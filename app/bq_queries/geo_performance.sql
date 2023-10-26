@@ -33,14 +33,17 @@ WITH
             ANY_VALUE(bidding_strategy) AS bidding_strategy,
             ANY_VALUE(account_id) AS account_id,
             ANY_VALUE(account_name) AS account_name,
+            ANY_VALUE(ocid) AS ocid,
             ANY_VALUE(currency) AS currency
         FROM `{bq_dataset}.mapping`
+        LEFT JOIN `{bq_dataset}.ocid_mapping` USING(account_id)
         GROUP BY 1
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
+    M.ocid,
     M.currency,
     M.campaign_id,
     M.campaign_name,
@@ -64,4 +67,4 @@ LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN GeoConstants AS GT
   ON AP.country_criterion_id = GT.constant_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14);

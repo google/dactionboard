@@ -69,8 +69,10 @@ WITH
             ANY_VALUE(bidding_strategy) AS bidding_strategy,
             ANY_VALUE(account_id) AS account_id,
             ANY_VALUE(account_name) AS account_name,
+            ANY_VALUE(ocid) AS ocid,
             ANY_VALUE(currency) AS currency
         FROM `{bq_dataset}.mapping`
+        LEFT JOIN `{bq_dataset}.ocid_mapping` USING(account_id)
         GROUP BY 1
     ),
     AdGroupTargetingTable AS (
@@ -127,6 +129,7 @@ SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
+    M.ocid,
     M.currency,
     M.campaign_id,
     M.campaign_name,
@@ -182,4 +185,4 @@ LEFT JOIN `{bq_dataset}.asset_mapping` AS Assets2
   ON V.responsive_companion_banner = CAST(Assets2.asset_id AS STRING)
 LEFT JOIN TargetingTable AS TT
     ON M.ad_group_id = TT.ad_group_id
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24);
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25);

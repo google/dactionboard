@@ -24,11 +24,29 @@ WITH CustomConvSplit AS (
             {% endfor %}
         FROM `{bq_dataset}.conversion_split` AS AP
         GROUP BY 1,2
+    ),
+    MappingTable AS (
+        SELECT
+            ad_group_id,
+            ANY_VALUE(ad_group_name) AS ad_group_name,
+            ANY_VALUE(ad_group_status) AS ad_group_status,
+            ANY_VALUE(campaign_id) AS campaign_id,
+            ANY_VALUE(campaign_name) AS campaign_name,
+            ANY_VALUE(campaign_status) AS campaign_status,
+            ANY_VALUE(bidding_strategy) AS bidding_strategy,
+            ANY_VALUE(account_id) AS account_id,
+            ANY_VALUE(account_name) AS account_name,
+            ANY_VALUE(ocid) AS ocid,
+            ANY_VALUE(currency) AS currency
+        FROM `{bq_dataset}.mapping`
+        LEFT JOIN `{bq_dataset}.ocid_mapping` USING(account_id)
+        GROUP BY 1
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
     M.account_id,
     M.account_name,
+    M.ocid,
     M.currency,
     M.campaign_id,
     M.campaign_name,
@@ -51,9 +69,9 @@ SELECT
     SUM(AP.engagements) AS engagements,
     ROUND(SUM(AP.cost) / 1e6) AS cost
 FROM `{bq_dataset}.ad_performance` AS AP
-INNER JOIN `{bq_dataset}.mapping` AS M
+INNER JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN CustomConvSplit AS CCS
   ON AP.ad_id = CCS.ad_id
     AND AP.date = CCS.date
-GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12);

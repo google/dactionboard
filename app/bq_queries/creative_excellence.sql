@@ -296,19 +296,23 @@ WITH
             USING(customer_id)
     ),
     MappingTable AS (
-      SELECT
-        campaign_id,
-        ANY_VALUE(campaign_name) AS campaign_name,
-        ANY_VALUE(campaign_status) AS campaign_status,
-        ANY_VALUE(bidding_strategy) AS bidding_strategy,
-        ANY_VALUE(account_id) AS account_id,
-        ANY_VALUE(account_name) AS account_name
-      FROM {bq_dataset}.mapping
-    GROUP BY 1
+        SELECT
+            campaign_id,
+            ANY_VALUE(campaign_name) AS campaign_name,
+            ANY_VALUE(campaign_status) AS campaign_status,
+            ANY_VALUE(bidding_strategy) AS bidding_strategy,
+            ANY_VALUE(account_id) AS account_id,
+            ANY_VALUE(account_name) AS account_name,
+            ANY_VALUE(ocid) AS ocid,
+            ANY_VALUE(currency) AS currency
+        FROM `{bq_dataset}.mapping`
+        LEFT JOIN `{bq_dataset}.ocid_mapping` USING(account_id)
+        GROUP BY 1
     )
 SELECT
     M.account_id,
     M.account_name,
+    M.ocid,
     M.campaign_id,
     M.campaign_name,
     M.campaign_status,
