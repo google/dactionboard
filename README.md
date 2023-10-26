@@ -148,17 +148,6 @@ What happens when a pubsub message published (as a result of `setup.sh start`):
 * the VM on startup parses the arguments from the CF (via VM's attributes) and execute dActionBoard in quite the same way as it executes locally (using `run-local.sh`).
 Additionally the VM's entrypoint script deletes the virtual machine upon completion of the run-local.sh.
 
-### Troubleshooting
-If you're getting an error at the creating Docker repository step:
-```
-ERROR: (gcloud.artifacts.repositories.create) INVALID_ARGUMENT: Maven config is not supported for format "DOCKER"
-- '@type': type.googleapis.com/google.rpc.DebugInfo
-  detail: '[ORIGINAL ERROR] generic::invalid_argument: Maven config is not supported
-    for format "DOCKER" [google.rpc.error_details_ext] { code: 3 message: "Maven config
-    is not supported for format \"DOCKER\"" }'
-```
-Please update your Cloud SDK CLI by running `gcloud components update`
-
 
 ### Gaarf Workflow Installation in Google Cloud
 *Back to [table of content](#table-of-content)*
@@ -192,7 +181,7 @@ You can use [Gaarf Workflows](https://github.com/google/ads-api-report-fetcher/t
 #### Running queries locally
 *Back to [table of content](#table-of-content)*
 
-In order to run App Reporting Pack locally please follow the steps outlined below:
+In order to run dActionBoard locally please follow the steps outlined below:
 
 * clone this repository
     ```
@@ -211,12 +200,12 @@ In order to run App Reporting Pack locally please follow the steps outlined belo
     ```
 * install dependencies:
     ```
-    pip install --require-hashes -r requirements.txt --no-deps
+    pip install --require-hashes -r app/requirements.txt --no-deps
     ```
-Please run `run-local.sh` script in a terminal to generate all necessary tables for App Reporting Pack:
+Please run `app/run-local.sh` script in a terminal to generate all necessary tables for dActionBoard:
 
 ```shell
-bash ./run-local.sh
+bash ./app/run-local.sh
 ```
 
 It will guide you through a series of questions to get all necessary parameters to run the scripts:
@@ -229,11 +218,11 @@ It will guide you through a series of questions to get all necessary parameters 
 * `Ads config` - path to `google-ads.yaml` file.
 
 After the initial run of `run-local.sh` command it will generate `dactionboard.yaml` config file with all necessary information used for future runs.
-When you run `bash run-local.sh` next time it will automatically pick up created configuration.
+When you run `bash app/run-local.sh` next time it will automatically pick up created configuration.
 
 ##### Schedule running `run-local.sh` as a cronjob
 
-When running `run-local.sh` scripts you can specify two options which are useful when running queries periodically (i.e. as a cron job):
+When running `app/run-local.sh` scripts you can specify two options which are useful when running queries periodically (i.e. as a cron job):
 
 * `-c <config>`- path to `dactionboard.yaml` config file. Comes handy when you have multiple config files or the configuration is located outside of current folder.
 * `-q` - skips all confirmation prompts and starts running scripts based on config file.
@@ -241,7 +230,7 @@ When running `run-local.sh` scripts you can specify two options which are useful
 If you installed all requirements in a virtual environment you can use the trick below to run the proper cronjob:
 
 ```
-* 1 * * * /usr/bin/env bash -c "source /path/to/your/venv/bin/activate && bash /path/to/dactionboard/run-local.sh -c /path/to/dactionboard.yaml -g /path/to/google-ads.yaml -q"
+* 1 * * * /usr/bin/env bash -c "source /path/to/your/venv/bin/activate && bash /path/to/dactionboard/app/run-local.sh -c /path/to/dactionboard.yaml -g /path/to/google-ads.yaml -q"
 ```
 
 This command will execute dActionBoard queries every day at 1 AM.
