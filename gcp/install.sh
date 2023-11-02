@@ -19,7 +19,7 @@ pip install --require-hashes -r requirements.txt --no-deps
 echo -e "${CYAN}Generating dActionBoard configuration...${WHITE}"
 RUNNING_IN_GCE=true
 export RUNNING_IN_GCE   # signaling to run-local.sh that we're running inside GCE (there'll be less questions)
-./run-local.sh --generate-config-only
+./run-local.sh --generate-config-only --validate-google-ads-config
 
 # deploy solution
 echo -e "${CYAN}Deploying Cloud components...${WHITE}"

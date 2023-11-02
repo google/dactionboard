@@ -14,6 +14,7 @@
 # limitations under the License.
 
 check_ads_config() {
+  validate=$1
   if [[ -n $ads_config ]]; then
     use_google_ads_config='y'
   elif [[ -f "./google-ads.yaml" ]]; then
@@ -52,6 +53,24 @@ refresh_token: ${REFRESH_TOKEN}
 login_customer_id: ${MCC_ID}
 use_proto_plus: True
     " > $ads_config
+  fi
+  if [[ $validate = "y" ]]; then
+    echo "Validating $ads_config..."
+    temp_file=$(mktemp)
+    set +e
+    gaarf "SELECT mobile_device_constant.type FROM mobile_device_constant LIMIT 1" --ads-config=$ads_config --input=console --output=console &> $temp_file
+    set -e
+    errors=$(cat $temp_file | grep -E "errors|exception" | wc -l)
+    if (($errors > 0)); then
+      echo -e "${RED}$ads_config is invalid, details below${NC} "
+      error_message=`sed -n -e '/GoogleAdsException/,/request_id/p' $temp_file`
+      if [[ -n $error_message ]]; then
+        echo $error_message
+      else
+        sed -n -e '/exception/,$p' $temp_file
+      fi
+      exit
+    fi
   fi
 }
 

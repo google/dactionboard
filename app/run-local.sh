@@ -18,6 +18,7 @@ SCRIPT_PATH=$(readlink -f "$0" | xargs dirname)
 source $SCRIPT_PATH/scripts/shell_utils/gaarf.sh
 source $SCRIPT_PATH/scripts/shell_utils/functions.sh
 
+set -e
 COLOR='\033[0;36m' # Cyan
 NC='\033[0m' # No color
 usage="bash run-local.sh -c|--config <config> -q|--quiet\n\n
@@ -35,6 +36,7 @@ solution_name_lowercase=$(echo $solution_name | tr '[:upper:]' '[:lower:]' |\
 
 quiet="n"
 generate_config_only="n"
+validate_ads_config="n"
 incremental="y"
 
 while :; do
@@ -56,6 +58,9 @@ case $1 in
     ;;
   --generate-config-only)
     generate_config_only="y"
+    ;;
+  --validate-google-ads-config)
+    validate_ads_config="y"
     ;;
   -h|--help)
     echo -e $usage;
@@ -232,7 +237,7 @@ run_with_config() {
   run_bq_queries
 }
 
-check_ads_config
+check_ads_config $validate_ads_config
 #
 # defaults
 start_date_days=90
