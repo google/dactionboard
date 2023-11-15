@@ -1,7 +1,9 @@
-# Creating dActionBoard in DataStudio
+# Creating dActionBoard in Looker Studio
 
 Once data for dActionBoard data are generated and stored in BigQuery you can
 proceed with replication.
+
+> **_IMPORTANT:_** After the dashboard is created you need to enable image previews, read details on how it can be done [here](#enable-image-previews).
 
 ## Creating dashboard with Looker Studio Dashboard Cloner
 
@@ -100,3 +102,13 @@ In order to replicate dashboard please do the following:
 Once all template datasources are replaced with new ones, click *Copy Report* and enjoy your new shiny dActionBoard!
 
 
+## Enable image previews
+
+After the dashboard is created all rendered images are [disabled](https://support.google.com/looker-studio/answer/7570489?hl=en#zippy=%2Cin-this-article). To activate them follow the steps below:
+
+* Click on **Edit** button
+* Go to **Resource**  and select the **dactionboard_ad_video_performance_copy** datasource.
+* Search for `preview` field
+* Click on three docs and select **Show** to enable preview
+
+	![enable preview](src/preview_enable.png)

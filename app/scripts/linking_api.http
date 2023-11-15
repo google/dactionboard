@@ -1,5 +1,5 @@
-https://datastudio.google.com/c/reporting/create?c.mode=edit&c.reportId=ad41d2ca-1d20-43a2-97b8-6cfa141e0f7a&
-r.reportName=dActionBoard_copy&
+https://datastudio.google.com/c/reporting/create?c.mode=edit&c.reportId=REPORT_ID&
+r.reportName=REPORT_NAME&
 ds.*.refreshFields=false&
 ds.excellence.connector=bigQuery&
 ds.excellence.datasourceName=dactionboard_creative_excellence_copy&

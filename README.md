@@ -284,5 +284,8 @@ lsd-cloner --answers=dashboard_answers.json
 This command will open a link in your browser with a copy of the dashboard.
 Alternatively you can follow the documentation on dashboard replication at [how-to-replicate-dashboard](docs/how-to-replicate-dashboard.md) section in docs.
 
+> **_IMPORTANT:_** After the dashboard is created you need to enable image previews, read details on how it can be done [here](docs/how-to-replicate-dashboard.md#enable-image-previews).
+
+
 ## Disclaimer
 This is not an officially supported Google product.
