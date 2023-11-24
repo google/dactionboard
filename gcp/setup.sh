@@ -152,19 +152,29 @@ deploy_cf() {
 
 deploy_files() {
   echo 'Deploying files to GCS'
-  if ! gsutil ls gs://$PROJECT_ID; then
+  if ! gsutil ls gs://$PROJECT_ID > /dev/null 2> /dev/null; then
+    echo "Creating GCS bucket gs://$PROJECT_ID"
     gsutil mb -b on gs://$PROJECT_ID
   fi
 
   GCS_BASE_PATH=gs://$PROJECT_ID/$NAME
-  gsutil -h "Content-Type:text/plain" cp ./../dactionboard.yaml $GCS_BASE_PATH/dactionboard.yaml
-  gsutil -h "Content-Type:text/plain" cp ./../google-ads.yaml $GCS_BASE_PATH/google-ads.yaml
 
-  gsutil -m rm -r $GCS_BASE_PATH/google_ads_queries
-  gsutil -m cp -R ./../google_ads_queries $GCS_BASE_PATH/google_ads_queries
-  gsutil -m cp -R ./../bq_queries $GCS_BASE_PATH/bq_queries
-  gsutil -m rm -r $GCS_BASE_PATH/scripts
-  gsutil -m cp -R ./../scripts $GCS_BASE_PATH/scripts
+  # NOTE: DO NOT add -m flag for gsutil! When executed under cloudshell_open (via Cloud Run Button) it won't copy files
+  echo "Removing existing files at $GCS_BASE_PATH"
+  gsutil rm -r $GCS_BASE_PATH/
+
+  # NOTE: if an error "module 'sys' has no attribute 'maxint'" occures, run this: `pip3 install -U crcmod`
+  echo "Copying application files to $GCS_BASE_PATH"
+  gsutil rsync -r -x ".*/__pycache__/.*|[.].*" ./../app $GCS_BASE_PATH
+  echo "Copying configs to $GCS_BASE_PATH"
+  gsutil -h "Content-Type:text/plain" cp ./../app/*.yaml $GCS_BASE_PATH/
+  if [[ -f ./../google-ads.yaml ]]; then
+    gsutil -h "Content-Type:text/plain" cp ./../google-ads.yaml $GCS_BASE_PATH/google-ads.yaml
+  elif [[ -f $HOME/google-ads.yaml ]]; then
+    gsutil -h "Content-Type:text/plain" cp $HOME/google-ads.yaml $GCS_BASE_PATH/google-ads.yaml
+  else
+    echo "Please upload google-ads.yaml"
+  fi
 }
 
 deploy_public_index() {
@@ -291,10 +301,10 @@ enable_private_google_access() {
 deploy_all() {
   enable_apis
   set_iam_permissions
+  deploy_files
   create_registry
   build_docker_image
   deploy_cf
-  deploy_files
   schedule_run
 }
 

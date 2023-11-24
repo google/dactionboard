@@ -21,9 +21,14 @@ if [[ -n $gcs_source_uri ]]; then
   mv "$folder_name/*" .
 fi
 
-# run dActionBoard
-./run-local.sh --quiet --config dactionboard.yaml --google-ads-config google-ads.yaml
+# run the application
+./start.sh 2>&1 | tee $LOG_NAME.log
 exitcode=$?
+
+while read -r line
+do
+  gcloud logging write $LOG_NAME "$line"
+done < $LOG_NAME.log
 
 if [ $exitcode -ne 0 ]; then
   gcloud logging write $LOG_NAME "[$(hostname)] dActionBoard application has finished execution with an error ($exitcode)" --severity ERROR

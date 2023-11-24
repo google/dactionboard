@@ -30,4 +30,6 @@ gcloud config set project $GOOGLE_CLOUD_PROJECT
 
 ./gcp/install.sh
 
-echo -e "${CYAN}Please ignore all output below${WHITE}"
+echo -e "${CYAN}!!!!! Please ignore all output below !!!!!${WHITE}"
+echo
+echo
