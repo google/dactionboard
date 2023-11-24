@@ -15,6 +15,7 @@ SELECT
     segments.date AS date,
     ad_group.id AS ad_group_id,
     ad_group_ad.ad.id AS ad_id,
+    segments.device AS device,
     segments.conversion_action AS conversion_action,
     segments.conversion_action_name AS conversion_name,
     metrics.conversions AS conversions,

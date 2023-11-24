@@ -117,13 +117,14 @@ WITH
         SELECT
             date,
             ad_id,
+            device,
             {% for custom_conversion in custom_conversions %}
                 {% for conversion_alias, conversion_name in custom_conversion.items() %}
                     SUM(IF(conversion_name IN ('{{conversion_name}}'), all_conversions, 0)) AS conversions_{{conversion_alias}},
                 {% endfor %}
             {% endfor %}
         FROM `{bq_dataset}.conversion_split` AS AP
-        GROUP BY 1,2
+        GROUP BY 1, 2, 3
     )
 SELECT
     PARSE_DATE("%Y-%m-%d", AP.date) AS day,
@@ -177,6 +178,7 @@ LEFT JOIN `{bq_dataset}.video_headlines_call_to_actions` AS V
 LEFT JOIN CustomConvSplit AS CCS
   ON AP.ad_id = CCS.ad_id
     AND AP.date = CCS.date
+    AND AP.device = CCS.device
 LEFT JOIN MappingTable AS M
   ON AP.ad_group_id = M.ad_group_id
 LEFT JOIN `{bq_dataset}.asset_mapping` AS Assets
