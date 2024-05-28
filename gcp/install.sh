@@ -13,7 +13,7 @@ WHITE='\033[0;37m'  # White
 echo -e "${CYAN}Creating Python virtual environment...${WHITE}"
 python3 -m venv .venv
 . .venv/bin/activate
-pip install --require-hashes -r requirements.txt --no-deps
+pip install --require-hashes -r app/requirements.txt --no-deps
 
 # generate dActionBoard configuration
 echo -e "${CYAN}Generating dActionBoard configuration...${WHITE}"
