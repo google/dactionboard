@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG_NAME=dactionboard-vm
+LOG_NAME=$(git config -f "./settings.ini" config.name)
 
 echo "Starting entrypoint script"
 
@@ -12,13 +12,13 @@ gcloud config set project $project_id
 # Fetch gcs uris fro the current instance metadata
 gcs_source_uri=$(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/attributes/gcs_source_uri -s --fail)
 
-gcloud logging write $LOG_NAME "[$(hostname)] Starting dActionBoard application (gcs_source_uri: $gcs_source_uri)"
+gcloud logging write $LOG_NAME "[$(hostname)] Starting application (gcs_source_uri: $gcs_source_uri)"
 
-# fetch dActionBoard files from GCS
+# fetch application files from GCS
 if [[ -n $gcs_source_uri ]]; then
   folder_name=$(basename "$gcs_source_uri")
   gsutil -m cp -R $gcs_source_uri .
-  mv "$folder_name/*" .
+  mv $folder_name/* .
 fi
 
 # run the application
@@ -31,23 +31,19 @@ do
 done < $LOG_NAME.log
 
 if [ $exitcode -ne 0 ]; then
-  gcloud logging write $LOG_NAME "[$(hostname)] dActionBoard application has finished execution with an error ($exitcode)" --severity ERROR
+  gcloud logging write $LOG_NAME "[$(hostname)] Application has finished execution with an error ($exitcode)" --severity ERROR
   # TODO: send the error somewhere
 else
-  gcloud logging write $LOG_NAME "[$(hostname)] dActionBoard application has finished execution successfully"
+  gcloud logging write $LOG_NAME "[$(hostname)] Application has finished execution successfully"
 fi
 
 # Check if index.html exists in the bucket. If so - create and upload dashboard.json
 gcs_base_path_public=$(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/attributes/gcs_base_path_public -s --fail)
-if [[ -n gcs_base_path_public ]]; then
-  # TODO: if run-local.sh failed we shouldn't create dashboard_url
-  if gsutil ls $gcs_base_path_public/index.html >/dev/null 2>&1; then
-    chmod +x ./scripts/create_dashboard.sh
-    dashboard_url=$(./scripts/create_dashboard.sh -L --config dactionboard.yaml)
-    echo "Created dashboard cloning url: $dashboard_url"
-    echo "{\"dashboardUrl\":\"$dashboard_url\"}" > dashboard.json
-    gsutil -h "Content-Type:application/json" -h "Cache-Control: no-store" cp dashboard.json $gcs_base_path_public/dashboard.json
-  fi
+create_dashboard_url=$(curl -H Metadata-Flavor:Google http://metadata.google.internal/computeMetadata/v1/instance/attributes/create_dashboard_url -s --fail)
+if [[ $exitcode -eq 0 && -n "$gcs_base_path_public" && -n "$create_dashboard_url" ]]; then
+  echo "{\"dashboardUrl\":\"$create_dashboard_url\"}" > dashboard.json
+  echo "Created dashboard.json with cloning url: $create_dashboard_link"
+  gsutil -h "Content-Type:application/json" -h "Cache-Control: no-store" cp dashboard.json $gcs_base_path_public/dashboard.json
 fi
 
 # Delete the VM (fetch a custom metadata key, it can be absent, so returns 404 - handling it with --fail options)
